@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Agri-Lens - Smart Crop Disease Detection",
   description: "AI-powered crop disease detection and management for farmers",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({

@@ -14,7 +14,6 @@ export default function CropScanner() {
   const [error, setError] = useState<string | null>(null)
   const [isClient, setIsClient] = useState(false)
   const [selectedCrop] = useState('Tomato')
-  const [capturing, setCapturing] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -25,52 +24,44 @@ export default function CropScanner() {
   }, [])
 
   const startCamera = useCallback(async () => {
+    // Clear previous state
+    setCapturedImage(null)
+    setError(null)
+    
+    if (!isClient) {
+      setError('Please wait for the page to load completely.')
+      return
+    }
+
+    // Check for mediaDevices support
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setError('Your browser does not support the camera API.')
+      return
+    }
+
     try {
-      setError(null)
-      
-      if (!isClient) {
-        setError('Please wait for the page to load completely.')
-        return
-      }
+      // Request camera access
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' }, // 'user' for front camera, 'environment' for back
+        audio: false,
+      })
 
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        setError('Camera not supported in this browser. Please use Chrome, Firefox, or Safari.')
-        return
-      }
-
-      const constraints = {
-        video: { 
-          facingMode: { ideal: 'environment' },
-          width: { ideal: 1280, min: 640 },
-          height: { ideal: 720, min: 480 }
-        }
-      }
-
-      const stream = await navigator.mediaDevices.getUserMedia(constraints)
-      
+      // Set the stream and link it to the video element
       if (videoRef.current) {
-        videoRef.current.srcObject = stream
+        videoRef.current.srcObject = mediaStream
         videoRef.current.onloadedmetadata = () => {
           setCameraActive(true)
         }
       }
     } catch (err: any) {
-      console.error('Camera error:', err)
-      let errorMessage = 'Camera access failed. '
-      
-      if (err.name === 'NotAllowedError') {
-        errorMessage += 'Please allow camera permissions and try again.'
-      } else if (err.name === 'NotFoundError') {
-        errorMessage += 'No camera found on this device.'
-      } else if (err.name === 'NotSupportedError') {
-        errorMessage += 'Camera is not supported in this browser.'
-      } else if (err.name === 'NotReadableError') {
-        errorMessage += 'Camera is being used by another application.'
-      } else {
-        errorMessage += `Please check your camera settings and try again. (${err.message})`
+      console.error('Error accessing camera:', err)
+      if (err instanceof Error) {
+        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+          setError('Camera access was denied. Please enable it in your browser settings.')
+        } else {
+          setError('No camera found or an error occurred. Please check your device.')
+        }
       }
-      
-      setError(errorMessage)
     }
   }, [isClient])
 
@@ -85,27 +76,25 @@ export default function CropScanner() {
 
   const capturePhoto = useCallback(() => {
     if (videoRef.current && canvasRef.current) {
-      setCapturing(true)
+      const video = videoRef.current
+      const canvas = canvasRef.current
       
-      // Add flash effect
-      setTimeout(() => {
-        const canvas = canvasRef.current
-        const video = videoRef.current
+      // Set canvas dimensions to the video's dimensions
+      canvas.width = video.videoWidth
+      canvas.height = video.videoHeight
+      
+      // Draw the current video frame onto the canvas
+      const context = canvas.getContext('2d')
+      if (context) {
+        context.drawImage(video, 0, 0, canvas.width, canvas.height)
         
-        if (canvas && video) {
-          canvas.width = video.videoWidth
-          canvas.height = video.videoHeight
-          
-          const context = canvas.getContext('2d')
-          if (context) {
-            context.drawImage(video, 0, 0)
-            const imageData = canvas.toDataURL('image/jpeg', 0.8)
-            setCapturedImage(imageData)
-            stopCamera()
-          }
-        }
-        setCapturing(false)
-      }, 200)
+        // Convert the canvas to a JPEG image data URL
+        const imageDataUrl = canvas.toDataURL('image/jpeg')
+        setCapturedImage(imageDataUrl)
+        
+        // Stop the camera stream
+        stopCamera()
+      }
     }
   }, [stopCamera])
 
@@ -125,6 +114,13 @@ export default function CropScanner() {
     setError(null)
     startCamera()
   }, [startCamera])
+
+  // Cleanup: stop camera when component unmounts
+  useEffect(() => {
+    return () => {
+      stopCamera()
+    }
+  }, [stopCamera])
 
   const analyzeCrop = useCallback(async () => {
     if (!capturedImage) return
@@ -278,15 +274,6 @@ export default function CropScanner() {
                         Upload Image
                       </Button>
                     </div>
-                    <div className="mt-4 text-xs text-gray-500">
-                      <p>💡 Camera not working? Try:</p>
-                      <ul className="text-left mt-2 space-y-1">
-                        <li>• Allow camera permissions when prompted</li>
-                        <li>• Use Chrome, Firefox, or Safari browser</li>
-                        <li>• Check if camera is being used by another app</li>
-                        <li>• Try uploading an image instead</li>
-                      </ul>
-                    </div>
                   </div>
                 </div>
               )}
@@ -300,11 +287,6 @@ export default function CropScanner() {
                     muted
                     className="w-full aspect-video bg-black rounded-lg"
                   />
-                  
-                  {/* Flash effect overlay */}
-                  {capturing && (
-                    <div className="absolute inset-0 bg-white opacity-80 rounded-lg animate-pulse"></div>
-                  )}
                   
                   {/* Camera overlay guide */}
                   <div className="absolute inset-0 pointer-events-none">

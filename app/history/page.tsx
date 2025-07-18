@@ -172,9 +172,7 @@ export default function HistoryPage() {
     const dataStr = JSON.stringify(scanHistory, null, 2)
     const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr)
     
-    const exportFileDefaultName = isClient ? 
-      `agri-lens-history-${new Date().toISOString().split('T')[0]}.json` :
-      'agri-lens-history.json'
+    const exportFileDefaultName = 'agri-lens-history.json'
     
     const linkElement = document.createElement('a')
     linkElement.setAttribute('href', dataUri)
