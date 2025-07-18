@@ -4,99 +4,21 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Camera, Upload, RotateCcw, CheckCircle, AlertTriangle, ArrowLeft, Loader2, X } from 'lucide-react'
+import { Upload, RotateCcw, CheckCircle, AlertTriangle, ArrowLeft, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 export default function CropScanner() {
-  const [cameraActive, setCameraActive] = useState(false)
   const [capturedImage, setCapturedImage] = useState<string | null>(null)
   const [analyzing, setAnalyzing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isClient, setIsClient] = useState(false)
   const [selectedCrop] = useState('Tomato')
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
 
   useEffect(() => {
     setIsClient(true)
   }, [])
-
-  const startCamera = useCallback(async () => {
-    // Clear previous state
-    setCapturedImage(null)
-    setError(null)
-    
-    if (!isClient) {
-      setError('Please wait for the page to load completely.')
-      return
-    }
-
-    // Check for mediaDevices support
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      setError('Your browser does not support the camera API.')
-      return
-    }
-
-    try {
-      // Request camera access
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment' }, // 'user' for front camera, 'environment' for back
-        audio: false,
-      })
-
-      // Set the stream and link it to the video element
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream
-        videoRef.current.onloadedmetadata = () => {
-          setCameraActive(true)
-        }
-      }
-    } catch (err: any) {
-      console.error('Error accessing camera:', err)
-      if (err instanceof Error) {
-        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-          setError('Camera access was denied. Please enable it in your browser settings.')
-        } else {
-          setError('No camera found or an error occurred. Please check your device.')
-        }
-      }
-    }
-  }, [isClient])
-
-  const stopCamera = useCallback(() => {
-    if (videoRef.current && videoRef.current.srcObject) {
-      const stream = videoRef.current.srcObject as MediaStream
-      stream.getTracks().forEach(track => track.stop())
-      videoRef.current.srcObject = null
-      setCameraActive(false)
-    }
-  }, [])
-
-  const capturePhoto = useCallback(() => {
-    if (videoRef.current && canvasRef.current) {
-      const video = videoRef.current
-      const canvas = canvasRef.current
-      
-      // Set canvas dimensions to the video's dimensions
-      canvas.width = video.videoWidth
-      canvas.height = video.videoHeight
-      
-      // Draw the current video frame onto the canvas
-      const context = canvas.getContext('2d')
-      if (context) {
-        context.drawImage(video, 0, 0, canvas.width, canvas.height)
-        
-        // Convert the canvas to a JPEG image data URL
-        const imageDataUrl = canvas.toDataURL('image/jpeg')
-        setCapturedImage(imageDataUrl)
-        
-        // Stop the camera stream
-        stopCamera()
-      }
-    }
-  }, [stopCamera])
 
   const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -112,15 +34,7 @@ export default function CropScanner() {
   const retakePhoto = useCallback(() => {
     setCapturedImage(null)
     setError(null)
-    startCamera()
-  }, [startCamera])
-
-  // Cleanup: stop camera when component unmounts
-  useEffect(() => {
-    return () => {
-      stopCamera()
-    }
-  }, [stopCamera])
+  }, [])
 
   const analyzeCrop = useCallback(async () => {
     if (!capturedImage) return
@@ -189,9 +103,9 @@ export default function CropScanner() {
                 <span>Back</span>
               </Button>
               <div className="flex items-center space-x-2">
-                <Camera className="h-5 w-5 text-green-600" />
+                <Upload className="h-5 w-5 text-green-600" />
                 <h1 className="text-xl font-semibold text-gray-900">
-                  Crop Scanner
+                  Image Analyzer
                 </h1>
               </div>
             </div>
@@ -255,75 +169,29 @@ export default function CropScanner() {
           </CardHeader>
           <CardContent>
             <div className="relative">
-              {!cameraActive && !capturedImage && (
+              {!capturedImage && (
                 <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
                   <div className="text-center">
-                    <Camera className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500 mb-4">Camera not active</p>
+                    <Upload className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500 mb-4">Upload an image to analyze</p>
                     <div className="space-y-2">
-                      <Button onClick={startCamera} className="w-full">
-                        <Camera className="h-4 w-4 mr-2" />
-                        Start Camera
-                      </Button>
                       <Button 
-                        variant="outline" 
                         onClick={() => fileInputRef.current?.click()}
                         className="w-full"
                       >
                         <Upload className="h-4 w-4 mr-2" />
-                        Upload Image
+                        Select Image
                       </Button>
                     </div>
-                  </div>
-                </div>
-              )}
-
-              {cameraActive && (
-                <div className="relative">
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    playsInline
-                    muted
-                    className="w-full aspect-video bg-black rounded-lg"
-                  />
-                  
-                  {/* Camera overlay guide */}
-                  <div className="absolute inset-0 pointer-events-none">
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border-2 border-white border-dashed rounded-lg w-64 h-64 opacity-50"></div>
-                    <div className="absolute top-4 left-4 right-4 text-white text-center">
-                      <p className="text-sm bg-black bg-opacity-50 rounded px-2 py-1">
-                        Position the leaf within the guide
-                      </p>
+                    <div className="mt-4 text-xs text-gray-500">
+                      <p>💡 Tips for better results:</p>
+                      <ul className="text-left mt-2 space-y-1">
+                        <li>• Use good lighting</li>
+                        <li>• Focus on one leaf at a time</li>
+                        <li>• Avoid shadows and blurred images</li>
+                        <li>• Take photos of affected areas</li>
+                      </ul>
                     </div>
-                  </div>
-                  
-                  {/* Camera controls */}
-                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-4">
-                    <Button
-                      size="lg"
-                      onClick={capturePhoto}
-                      className="rounded-full w-20 h-20 bg-white text-green-600 hover:bg-green-50 shadow-xl border-4 border-green-600 hover:border-green-700 transition-all duration-200 hover:scale-105"
-                      title="Capture Photo"
-                    >
-                      <Camera className="h-10 w-10" />
-                    </Button>
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      onClick={stopCamera}
-                      className="rounded-full w-16 h-16 bg-white shadow-lg hover:bg-gray-50 transition-all duration-200"
-                      title="Stop Camera"
-                    >
-                      <X className="h-6 w-6" />
-                    </Button>
-                  </div>
-                  
-                  {/* Instructions overlay */}
-                  <div className="absolute bottom-28 left-1/2 transform -translate-x-1/2 text-center">
-                    <p className="text-white text-sm bg-black bg-opacity-50 rounded-full px-4 py-2 shadow-lg">
-                      📸 Click the camera button to capture
-                    </p>
                   </div>
                 </div>
               )}
@@ -345,7 +213,7 @@ export default function CropScanner() {
                       className="bg-white shadow-lg"
                     >
                       <RotateCcw className="h-4 w-4 mr-2" />
-                      Retake
+                      Choose Another
                     </Button>
                     <Button
                       size="lg"
@@ -389,9 +257,6 @@ export default function CropScanner() {
           onChange={handleFileUpload}
           className="hidden"
         />
-
-        {/* Hidden canvas for image capture */}
-        <canvas ref={canvasRef} className="hidden" />
       </main>
     </div>
   )
