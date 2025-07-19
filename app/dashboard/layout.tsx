@@ -77,27 +77,34 @@ export default function DashboardLayout({
           to account for the sidebar's width and state. */}
       <SidebarInset>
         {/* The header is sticky for better UX on long pages. */}
-        <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
-          {/* The hamburger button to toggle the sidebar on mobile. */}
-          <SidebarTrigger className="-ml-1" />
+        <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between border-b bg-background px-4">
+          {/* Show AgriLens title only on mobile */}
+          <h1 className="text-xl font-bold text-gray-900 lg:hidden">
+            Agri-Lens
+          </h1>
 
-          <Separator
-            orientation="vertical"
-            className="hidden data-[orientation=vertical]:h-4 md:block"
-          />
+          <div className="flex items-center gap-2">
+            {/* The hamburger button to toggle the sidebar on mobile. */}
+            <SidebarTrigger className="-ml-1" />
 
-          {/* Example breadcrumbs. This could be made dynamic based on the route. */}
-          <Breadcrumb className="hidden md:flex">
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Overview</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+            <Separator
+              orientation="vertical"
+              className="hidden data-[orientation=vertical]:h-4 md:block"
+            />
+
+            {/* Example breadcrumbs. This could be made dynamic based on the route. */}
+            <Breadcrumb className="hidden md:flex">
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Overview</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
         </header>
 
         {/* The main content from your page files will be rendered here. */}
