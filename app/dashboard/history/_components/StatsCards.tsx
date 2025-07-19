@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Leaf, Shield, AlertTriangle, Calendar } from "lucide-react";
 import { HistoryStats } from "./types";
@@ -6,64 +7,75 @@ interface StatsCardsProps {
   stats: HistoryStats;
 }
 
-export function StatsCards({ stats }: StatsCardsProps) {
+const StatCard = memo(
+  ({
+    title,
+    value,
+    icon: Icon,
+    color,
+  }: {
+    title: string;
+    value: string | number;
+    icon: any;
+    color: string;
+  }) => (
+    <Card className="hover:shadow-md transition-shadow duration-200">
+      <CardContent className="p-4 sm:p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className={`text-xl sm:text-2xl font-bold ${color}`}>{value}</p>
+            <p className="text-sm text-gray-600">{title}</p>
+          </div>
+          <Icon className={`h-6 w-6 sm:h-8 sm:w-8 ${color}`} />
+        </div>
+      </CardContent>
+    </Card>
+  )
+);
+
+StatCard.displayName = "StatCard";
+
+export const StatsCards = memo(({ stats }: StatsCardsProps) => {
+  const statItems = [
+    {
+      title: "Total Scans",
+      value: stats.totalScans,
+      icon: Leaf,
+      color: "text-gray-900",
+    },
+    {
+      title: "Healthy Plants",
+      value: stats.healthyCount,
+      icon: Shield,
+      color: "text-green-600",
+    },
+    {
+      title: "Diseases Found",
+      value: stats.diseasedCount,
+      icon: AlertTriangle,
+      color: "text-red-600",
+    },
+    {
+      title: "Success Rate",
+      value: `${stats.successRate}%`,
+      icon: Calendar,
+      color: "text-blue-600",
+    },
+  ];
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
-      <Card>
-        <CardContent className="p-4 sm:p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xl sm:text-2xl font-bold text-gray-900">
-                {stats.totalScans}
-              </p>
-              <p className="text-sm text-gray-600">Total Scans</p>
-            </div>
-            <Leaf className="h-6 w-6 sm:h-8 sm:w-8 text-green-600" />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardContent className="p-4 sm:p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xl sm:text-2xl font-bold text-green-600">
-                {stats.healthyCount}
-              </p>
-              <p className="text-sm text-gray-600">Healthy Plants</p>
-            </div>
-            <Shield className="h-6 w-6 sm:h-8 sm:w-8 text-green-600" />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardContent className="p-4 sm:p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xl sm:text-2xl font-bold text-red-600">
-                {stats.diseasedCount}
-              </p>
-              <p className="text-sm text-gray-600">Diseases Found</p>
-            </div>
-            <AlertTriangle className="h-6 w-6 sm:h-8 sm:w-8 text-red-600" />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardContent className="p-4 sm:p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xl sm:text-2xl font-bold text-blue-600">
-                {stats.successRate}%
-              </p>
-              <p className="text-sm text-gray-600">Success Rate</p>
-            </div>
-            <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
-          </div>
-        </CardContent>
-      </Card>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      {statItems.map((item, index) => (
+        <StatCard
+          key={index}
+          title={item.title}
+          value={item.value}
+          icon={item.icon}
+          color={item.color}
+        />
+      ))}
     </div>
   );
-}
+});
+
+StatsCards.displayName = "StatsCards";

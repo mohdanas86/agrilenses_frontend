@@ -45,7 +45,10 @@
 //   );
 // }
 
+"use client";
+
 import React from "react";
+import { usePathname } from "next/navigation";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
@@ -62,11 +65,35 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
+// Dynamic breadcrumb mapping
+const getBreadcrumbInfo = (pathname: string) => {
+  const segments = pathname.split('/').filter(Boolean);
+  
+  if (segments.length === 1 && segments[0] === 'dashboard') {
+    return { title: 'Overview', isActive: true };
+  }
+  
+  const pageMap: Record<string, string> = {
+    'history': 'History',
+    'scanner': 'Scanner',
+    'results': 'Results',
+  };
+  
+  const currentPage = segments[segments.length - 1];
+  return {
+    title: pageMap[currentPage] || 'Overview',
+    isActive: true
+  };
+};
+
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+  const breadcrumbInfo = getBreadcrumbInfo(pathname);
+
   return (
     // Provides sidebar state (open/closed) to all child components.
     <SidebarProvider>
@@ -92,7 +119,7 @@ export default function DashboardLayout({
               className="hidden data-[orientation=vertical]:h-4 md:block"
             />
 
-            {/* Example breadcrumbs. This could be made dynamic based on the route. */}
+            {/* Dynamic breadcrumbs based on current route */}
             <Breadcrumb className="hidden md:flex">
               <BreadcrumbList>
                 <BreadcrumbItem>
@@ -100,7 +127,7 @@ export default function DashboardLayout({
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Overview</BreadcrumbPage>
+                  <BreadcrumbPage>{breadcrumbInfo.title}</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
