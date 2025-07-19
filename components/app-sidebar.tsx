@@ -43,17 +43,17 @@ const data = {
         },
         {
           title: "Scanner",
-          url: "/scanner",
+          url: "/dashboard/scanner",
           icon: Camera,
         },
         {
           title: "Results",
-          url: "/results",
+          url: "/dashboard/results",
           icon: FileText,
         },
         {
           title: "History",
-          url: "/history",
+          url: "/dashboard/history",
           icon: History,
         },
       ],
@@ -113,8 +113,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </div>
         </div>
         <div className="bg-green-50 rounded-lg p-3 border border-green-200">
-          <p className="text-sm text-green-800 font-medium">Smart Crop Health Monitor</p>
-          <p className="text-xs text-green-600 mt-1">AI-powered disease detection</p>
+          <p className="text-sm text-green-800 font-medium">
+            Smart Crop Health Monitor
+          </p>
+          <p className="text-xs text-green-600 mt-1">
+            AI-powered disease detection
+          </p>
         </div>
       </SidebarHeader>
       <SidebarContent>
