@@ -1,4 +1,35 @@
 import * as React from "react";
+
+type MainNavItem = {
+  title: string;
+  url: string;
+  icon: React.ComponentType<{ className?: string }>;
+  isActive?: boolean;
+};
+
+type CropModelNavItem = {
+  title: string;
+  url: string;
+  iconuri: string;
+};
+
+type NavGroup =
+  | {
+      title: "Main Navigation";
+      url: string;
+      items: MainNavItem[];
+    }
+  | {
+      title: "Crop Models";
+      url: string;
+      items: CropModelNavItem[];
+    };
+
+type UserNavItem = {
+  title: string;
+  url: string;
+  icon: React.ComponentType<{ className?: string }>;
+};
 import {
   User,
   Settings,
@@ -11,8 +42,7 @@ import {
   Leaf,
 } from "lucide-react";
 
-import { SearchForm } from "@/components/search-form";
-import { VersionSwitcher } from "@/components/version-switcher";
+import { GiTomato } from "react-icons/gi";
 import {
   Sidebar,
   SidebarContent,
@@ -28,7 +58,10 @@ import {
 } from "@/components/ui/sidebar";
 
 // This is sample data.
-const data = {
+const data: {
+  navMain: NavGroup[];
+  userNav: UserNavItem[];
+} = {
   // versions: ["1.0.1", "1.1.0-alpha", "2.0.0-beta1"],
   navMain: [
     {
@@ -64,13 +97,13 @@ const data = {
       items: [
         {
           title: "Tomato",
-          url: "/models/tomato",
-          icon: Leaf,
+          url: "/dashboard/models/tomato",
+          iconuri: "/vegicons/tomate.png",
         },
         {
           title: "Potato",
-          url: "/models/potato",
-          icon: Leaf,
+          url: "/dashboard/models/potato",
+          iconuri: "/vegicons/potato.png",
         },
       ],
     },
@@ -78,12 +111,12 @@ const data = {
   userNav: [
     {
       title: "Profile",
-      url: "/profile",
+      url: "/dashboard/profile",
       icon: User,
     },
     {
       title: "Settings",
-      url: "/settings",
+      url: "/dashboard/settings",
       icon: Settings,
     },
     {
@@ -128,16 +161,40 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {item.items.map((navItem) => (
-                  <SidebarMenuItem key={navItem.title}>
-                    <SidebarMenuButton asChild isActive={navItem.isActive}>
-                      <a href={navItem.url} className="flex items-center gap-2">
-                        {navItem.icon && <navItem.icon className="h-4 w-4" />}
-                        {navItem.title}
-                      </a>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                {item.title === "Crop Models"
+                  ? item.items.map((navItem) => (
+                      <SidebarMenuItem key={navItem.title}>
+                        <SidebarMenuButton asChild>
+                          <a
+                            href={navItem.url}
+                            className="flex items-center gap-2"
+                          >
+                            <img
+                              src={navItem.iconuri}
+                              alt={navItem.title}
+                              className="h-4 w-4"
+                            />
+
+                            {navItem.title}
+                          </a>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    ))
+                  : item.items.map((navItem) => (
+                      <SidebarMenuItem key={navItem.title}>
+                        <SidebarMenuButton asChild>
+                          <a
+                            href={navItem.url}
+                            className="flex items-center gap-2"
+                          >
+                            {navItem.icon && (
+                              <navItem.icon className="h-4 w-4" />
+                            )}
+                            {navItem.title}
+                          </a>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    ))}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
