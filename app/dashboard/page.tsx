@@ -81,6 +81,21 @@ export default function AgriLensDashboard() {
       .replace(",", " at");
   };
 
+  const generate = async () => {
+    const res = await fetch("/api/generate-suggestion", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        plantName: "Tomato",
+        disease: "Early blight",
+        confidence: 0.92,
+      }),
+    });
+
+    const data = await res.json();
+    console.log(data.suggestion);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800">
       <main className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -258,6 +273,13 @@ export default function AgriLensDashboard() {
               </ul>
             </div>
           </div>
+        </div>
+
+        {/* Footer */}
+        <div>
+          <Button variant="outline" onClick={generate}>
+            Generate Report
+          </Button>
         </div>
       </main>
     </div>

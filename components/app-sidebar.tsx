@@ -224,7 +224,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     {item.title === "Logout" ? (
-                      <button 
+                      <button
                         onClick={handleLogout}
                         className="flex items-center gap-2 w-full text-left"
                       >

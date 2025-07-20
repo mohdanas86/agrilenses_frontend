@@ -114,7 +114,7 @@ const Header = () => {
           <div className="flex items-center space-x-4">
             <SignedOut>
               <div className="hidden sm:flex items-center space-x-3">
-                <SignInButton 
+                <SignInButton
                   mode="modal"
                   forceRedirectUrl="/dashboard"
                   signUpForceRedirectUrl="/dashboard"
@@ -127,7 +127,7 @@ const Header = () => {
                     Sign In
                   </Button>
                 </SignInButton>
-                <SignUpButton 
+                <SignUpButton
                   mode="modal"
                   forceRedirectUrl="/dashboard"
                   signInForceRedirectUrl="/dashboard"
@@ -207,7 +207,7 @@ const Header = () => {
 
               <SignedOut>
                 <div className="border-t border-gray-200 mt-2 pt-2 space-y-2">
-                  <SignInButton 
+                  <SignInButton
                     mode="modal"
                     forceRedirectUrl="/dashboard"
                     signUpForceRedirectUrl="/dashboard"
@@ -220,7 +220,7 @@ const Header = () => {
                       Sign In
                     </Button>
                   </SignInButton>
-                  <SignUpButton 
+                  <SignUpButton
                     mode="modal"
                     forceRedirectUrl="/dashboard"
                     signInForceRedirectUrl="/dashboard"
