@@ -1,4 +1,6 @@
 import * as React from "react";
+import { useClerk, useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 type MainNavItem = {
   title: string;
@@ -133,6 +135,19 @@ const data: {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { signOut } = useClerk();
+  const { isSignedIn } = useUser();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      router.push("/"); // Redirect to home page
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
   return (
     <Sidebar {...props}>
       <SidebarHeader className="p-6 border-b border-gray-200">
@@ -208,10 +223,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               {data.userNav.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url} className="flex items-center gap-2">
-                      <item.icon className="h-4 w-4" />
-                      {item.title}
-                    </a>
+                    {item.title === "Logout" ? (
+                      <button 
+                        onClick={handleLogout}
+                        className="flex items-center gap-2 w-full text-left"
+                      >
+                        <item.icon className="h-4 w-4" />
+                        {item.title}
+                      </button>
+                    ) : item.title === "Login" && isSignedIn ? null : (
+                      <a href={item.url} className="flex items-center gap-2">
+                        <item.icon className="h-4 w-4" />
+                        {item.title}
+                      </a>
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
