@@ -7,6 +7,7 @@ export interface ScanRecord {
   image: string;
   isHealthy: boolean;
   location?: string;
+  suggestion?: any; // Add suggestion field to match database schema
 }
 
 export type FilterStatus = 'all' | 'healthy' | 'diseased';

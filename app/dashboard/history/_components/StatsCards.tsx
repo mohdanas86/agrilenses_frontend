@@ -1,77 +1,138 @@
 import { memo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Leaf, Shield, AlertTriangle, Calendar } from "lucide-react";
+import {
+  Leaf,
+  Shield,
+  AlertTriangle,
+  TrendingUp,
+  Activity,
+  Target,
+} from "lucide-react";
 import { HistoryStats } from "./types";
 
 interface StatsCardsProps {
   stats: HistoryStats;
 }
 
-const StatCard = memo(
+const MetricCard = memo(
   ({
     title,
     value,
     icon: Icon,
-    color,
+    type = "neutral",
+    description,
   }: {
     title: string;
     value: string | number;
     icon: any;
-    color: string;
-  }) => (
-    <Card className="hover:shadow-md transition-shadow duration-200">
-      <CardContent className="p-4 sm:p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className={`text-xl sm:text-2xl font-bold ${color}`}>{value}</p>
-            <p className="text-sm text-gray-600">{title}</p>
+    type?: "neutral" | "success" | "warning" | "info";
+    description?: string;
+  }) => {
+    const getStyles = () => {
+      switch (type) {
+        case "success":
+          return {
+            border: "border-green-200",
+            bg: "bg-green-50",
+            icon: "text-green-600",
+            text: "text-green-900",
+            value: "text-green-800",
+          };
+        case "warning":
+          return {
+            border: "border-red-200",
+            bg: "bg-red-50",
+            icon: "text-red-600",
+            text: "text-red-900",
+            value: "text-red-800",
+          };
+        case "info":
+          return {
+            border: "border-blue-200",
+            bg: "bg-blue-50",
+            icon: "text-blue-600",
+            text: "text-blue-900",
+            value: "text-blue-800",
+          };
+        default:
+          return {
+            border: "border-gray-200",
+            bg: "bg-gray-50",
+            icon: "text-gray-600",
+            text: "text-gray-900",
+            value: "text-gray-800",
+          };
+      }
+    };
+
+    const styles = getStyles();
+
+    return (
+      <Card
+        className={`border ${styles.border} shadow-sm bg-white hover:shadow-md transition-shadow duration-200`}
+      >
+        <CardContent className="p-6">
+          <div className={`p-3 ${styles.bg} rounded-lg mb-4 w-fit`}>
+            <Icon className={`h-6 w-6 ${styles.icon}`} />
           </div>
-          <Icon className={`h-6 w-6 sm:h-8 sm:w-8 ${color}`} />
-        </div>
-      </CardContent>
-    </Card>
-  )
+
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-gray-600">{title}</p>
+            <p className={`text-3xl font-bold ${styles.value}`}>{value}</p>
+            {description && (
+              <p className="text-sm text-gray-500">{description}</p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 );
 
-StatCard.displayName = "StatCard";
+MetricCard.displayName = "MetricCard";
 
 export const StatsCards = memo(({ stats }: StatsCardsProps) => {
   const statItems = [
     {
-      title: "Total Scans",
+      title: "Total Plant Scans",
       value: stats.totalScans,
-      icon: Leaf,
-      color: "text-gray-900",
+      icon: Activity,
+      type: "neutral" as const,
+      description: "Completed analyses",
     },
     {
       title: "Healthy Plants",
       value: stats.healthyCount,
       icon: Shield,
-      color: "text-green-600",
+      type: "success" as const,
+      description: "No diseases detected",
     },
     {
-      title: "Diseases Found",
+      title: "Issues Detected",
       value: stats.diseasedCount,
       icon: AlertTriangle,
-      color: "text-red-600",
+      type: "warning" as const,
+      description: "Requiring attention",
     },
     {
-      title: "Success Rate",
+      title: "Health Success Rate",
       value: `${stats.successRate}%`,
-      icon: Calendar,
-      color: "text-blue-600",
+      icon: Target,
+      type: "info" as const,
+      description: "Overall plant health",
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {statItems.map((item, index) => (
-        <StatCard
+        <MetricCard
           key={index}
           title={item.title}
           value={item.value}
           icon={item.icon}
-          color={item.color}
+          type={item.type}
+          description={item.description}
         />
       ))}
     </div>

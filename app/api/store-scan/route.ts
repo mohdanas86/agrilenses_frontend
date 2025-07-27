@@ -1,20 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { auth } from "@clerk/nextjs/server";
 
 const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
+    const { userId } = await auth();
+    
+    // Validate user authentication
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
     console.log("Received request body:", body);
     
-    const { userId, plantName, disease, confidence, imageUrl, suggestion } = body;
+    const { plantName, disease, confidence, imageUrl, suggestion } = body;
 
     // Validate required fields
-    if (!userId || !plantName || !disease || confidence === undefined || !imageUrl) {
-      console.log("Missing required fields:", { userId, plantName, disease, confidence, imageUrl });
+    if (!plantName || !disease || confidence === undefined || !imageUrl) {
+      console.log("Missing required fields:", { plantName, disease, confidence, imageUrl });
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Missing required fields: plantName, disease, confidence, imageUrl" },
         { status: 400 }
       );
     }

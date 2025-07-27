@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { ScanRecord, FilterStatus, SortBy, HistoryStats } from './types';
-import { mockScanHistory } from './mock-data';
 
 export function useHistoryState() {
   const [scanHistory, setScanHistory] = useState<ScanRecord[]>([]);
@@ -9,12 +8,52 @@ export function useHistoryState() {
   const [filterCrop, setFilterCrop] = useState<string>('all');
   const [sortBy, setSortBy] = useState<SortBy>('date');
   const [isClient, setIsClient] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setIsClient(true);
-    // In a real app, this would fetch from an API
-    setScanHistory(mockScanHistory);
+    fetchScanHistory();
   }, []);
+
+  const fetchScanHistory = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const response = await fetch('/api/history');
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to fetch scan history');
+      }
+
+      if (data.success && data.scanHistory) {
+        // Transform the data to match the frontend interface
+        const transformedHistory: ScanRecord[] = data.scanHistory.map((scan: any) => ({
+          id: scan.id,
+          crop: scan.crop,
+          disease: scan.disease,
+          confidence: scan.confidence < 1 ? scan.confidence : scan.confidence / 100, // Normalize confidence to 0-1 range
+          timestamp: new Date(scan.timestamp),
+          image: scan.image,
+          isHealthy: scan.isHealthy,
+          location: undefined, // Optional field
+          suggestion: scan.suggestion
+        }));
+
+        setScanHistory(transformedHistory);
+      } else {
+        setScanHistory([]);
+      }
+    } catch (error) {
+      console.error('Error fetching scan history:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load scan history');
+      setScanHistory([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const filteredAndSortedHistory = scanHistory
     .filter(record => {
@@ -90,9 +129,12 @@ export function useHistoryState() {
     sortBy,
     setSortBy,
     isClient,
+    isLoading,
+    error,
     filteredAndSortedHistory,
     getTimeDifference,
     getStats,
     exportHistory,
+    refetch: fetchScanHistory,
   };
 }

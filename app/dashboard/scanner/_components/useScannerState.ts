@@ -121,7 +121,6 @@ export function useScannerState() {
     let storedSuccessfully = false;
     try {
       const analysisData = await axios.post("/api/store-scan", {
-        userId: userId,
         plantName: selectedCrop.name,
         disease: predictionResponse.data.prediction || null,
         confidence: predictionResponse.data.confidence || 0,
