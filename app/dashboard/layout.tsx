@@ -64,25 +64,26 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import Link from "next/link";
 
 // Dynamic breadcrumb mapping
 const getBreadcrumbInfo = (pathname: string) => {
-  const segments = pathname.split('/').filter(Boolean);
-  
-  if (segments.length === 1 && segments[0] === 'dashboard') {
-    return { title: 'Overview', isActive: true };
+  const segments = pathname.split("/").filter(Boolean);
+
+  if (segments.length === 1 && segments[0] === "dashboard") {
+    return { title: "Overview", isActive: true };
   }
-  
+
   const pageMap: Record<string, string> = {
-    'history': 'History',
-    'scanner': 'Scanner',
-    'results': 'Results',
+    history: "History",
+    scanner: "Scanner",
+    results: "Results",
   };
-  
+
   const currentPage = segments[segments.length - 1];
   return {
-    title: pageMap[currentPage] || 'Overview',
-    isActive: true
+    title: pageMap[currentPage] || "Overview",
+    isActive: true,
   };
 };
 
@@ -106,9 +107,9 @@ export default function DashboardLayout({
         {/* The header is sticky for better UX on long pages. */}
         <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between border-b bg-background px-4">
           {/* Show AgriLens title only on mobile */}
-          <h1 className="text-xl font-bold text-gray-900 lg:hidden">
-            Agri-Lens
-          </h1>
+          <Link href={"/"} className="lg:hidden">
+            <h1 className="text-xl font-bold text-gray-900">AgriLenses</h1>
+          </Link>
 
           <div className="flex items-center gap-2">
             {/* The hamburger button to toggle the sidebar on mobile. */}

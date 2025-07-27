@@ -9,10 +9,10 @@ import axios from 'axios'
 
 export function useScannerState() {
   const router = useRouter();
+  const { selectedCrop, setSelectedCrop, userId } = useGlobalContext();
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedCrop, setSelectedCrop] = useState<CropModel>(cropModels[0]);
 
   const handleImageSelect = useCallback((image: string) => {
     setCapturedImage(image);
@@ -26,7 +26,7 @@ export function useScannerState() {
 
   const handleCropSelect = useCallback((crop: CropModel) => {
     setSelectedCrop(crop);
-  }, []);
+  }, [setSelectedCrop]);
 
   const handleBack = useCallback(() => {
     router.back();
@@ -41,7 +41,6 @@ export function useScannerState() {
   }, [router]);
 
   // ======================================
-  const { userId } = useGlobalContext();
   
   // console.log("Current selected crop:", selectedCrop.name.toLowerCase());  
   // console.log("Captured image:", capturedImage);
@@ -169,7 +168,6 @@ export function useScannerState() {
     analyzing,
     error,
     selectedCrop,
-    
     // Handlers
     handleImageSelect,
     handleRetakePhoto,

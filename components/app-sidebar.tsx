@@ -58,6 +58,7 @@ import {
   SidebarRail,
   SidebarFooter,
 } from "@/components/ui/sidebar";
+import Link from "next/link";
 
 // This is sample data.
 const data: {
@@ -156,7 +157,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <Leaf className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-gray-900">AgriLenses</h1>
+            <Link href={"/"}>
+              <h1 className="text-xl font-bold text-gray-900">AgriLenses</h1>
+            </Link>
             <p className="text-xs text-green-600 font-medium">v1.0.1</p>
           </div>
         </div>

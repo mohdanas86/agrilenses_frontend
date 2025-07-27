@@ -7,7 +7,7 @@ export const cropModels: CropModel[] = [
     emoji: "🍅",
     description: "Detects common tomato diseases",
     accuracy: "96.2%",
-    diseases: ["Late Blight", "Early Blight", "Bacterial Spot", "Leaf Mold"],
+    diseases: ["Tomato Bacterial spot", "Tomato Early blight", "Tomato Late blight", "Tomato Leaf Mold", "Tomato Septoria leaf spot", "Tomato Spider mites Two-spotted spider mite", "Tomato Target Spot", "Tomato Tomato Yellow Leaf Curl Virus", "Tomato Tomato mosaic virus", "Tomato healthy"],
   },
   {
     id: "potato",
@@ -15,7 +15,7 @@ export const cropModels: CropModel[] = [
     emoji: "🥔",
     description: "Identifies potato plant diseases",
     accuracy: "94.8%",
-    diseases: ["Late Blight", "Early Blight", "Common Scab", "Black Dot"],
+    diseases: ["Late Blight", "Early Blight"],
   },
   {
     id: "rice",

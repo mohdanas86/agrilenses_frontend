@@ -21,6 +21,9 @@ import {
   Thermometer,
   Lightbulb,
 } from "lucide-react";
+import { useScannerState } from "./scanner/_components/useScannerState";
+import { cropModels } from "./scanner/_components";
+import { useGlobalContext } from "@/context/GlobalContext";
 
 // Types
 interface WeatherData {
@@ -54,6 +57,31 @@ export default function AgriLensDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
 
+  // ======================================
+  // update model according to selected crop
+  const { setSelectedCrop } = useGlobalContext();
+
+  const handleCropSelection = (crop: (typeof supportedCrops)[number]) => {
+    try {
+      const matchingModel = cropModels.find(
+        (model) => model.name.toLowerCase() === crop.name.toLowerCase()
+      );
+
+      if (matchingModel) {
+        // Use the global context to set the selected crop
+        setSelectedCrop(matchingModel);
+        // Navigate to scanner page after successful crop selection
+        router.push("/dashboard/scanner");
+      } else {
+        console.log("No matching model found for crop:", crop.name);
+      }
+    } catch (err) {
+      console.log("Error selecting crop model:", err);
+    }
+  };
+
+  // ======================================
+
   useEffect(() => {
     // Set the initial time and start the interval timer
     const now = new Date();
@@ -79,21 +107,6 @@ export default function AgriLensDashboard() {
         hour12: true,
       })
       .replace(",", " at");
-  };
-
-  const generate = async () => {
-    const res = await fetch("/api/generate-suggestion", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        plantName: "Tomato",
-        disease: "Early blight",
-        confidence: 0.92,
-      }),
-    });
-
-    const data = await res.json();
-    console.log(data.suggestion);
   };
 
   return (
@@ -164,6 +177,7 @@ export default function AgriLensDashboard() {
                   {filteredCrops.map((crop) => (
                     <button
                       key={crop.name}
+                      onClick={() => handleCropSelection(crop)}
                       className={`group p-4 rounded-lg border transition-all duration-200 text-center ${
                         crop.isAval
                           ? "hover:border-green-500 hover:bg-green-50/50 border-gray-200"
