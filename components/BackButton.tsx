@@ -18,7 +18,7 @@ export const BackButton = ({ title }: { title: string }) => {
       <Button
         className="flex items-center justify-center"
         variant="outline"
-        size="sm"
+        // size="sm"
         onClick={handleClick}
       >
         <ArrowLeft className="h-4 w-4" />
