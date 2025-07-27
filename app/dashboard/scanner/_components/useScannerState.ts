@@ -28,44 +28,6 @@ export function useScannerState() {
     setSelectedCrop(crop);
   }, []);
 
-  // const handleAnalyzeCrop = useCallback(async () => {
-  //   if (!capturedImage) return;
-
-  //   setAnalyzing(true);
-  //   setError(null);
-
-  //   try {
-  //     // Simulate API call
-  //     await new Promise((resolve) => setTimeout(resolve, 3000));
-
-  //     // Mock analysis result
-  //     const mockResults: ScanResult[] = [
-  //       { disease: null, confidence: 96, isHealthy: true },
-  //       { disease: "Late Blight", confidence: 94, isHealthy: false },
-  //       { disease: "Early Blight", confidence: 87, isHealthy: false },
-  //       { disease: "Bacterial Spot", confidence: 92, isHealthy: false },
-  //     ];
-
-  //     const result = mockResults[Math.floor(Math.random() * mockResults.length)];
-
-  //     // Navigate to results page with the analysis result
-  //     const resultData: AnalysisData = {
-  //       crop: selectedCrop.name,
-  //       image: capturedImage,
-  //       ...result,
-  //       timestamp: new Date().toISOString(),
-  //     };
-
-  //     localStorage.setItem("scanResult", JSON.stringify(resultData));
-  //     router.push("/results");
-  //   } catch (err) {
-  //     setError("Analysis failed. Please try again.");
-  //     console.error("Analysis error:", err);
-  //   } finally {
-  //     setAnalyzing(false);
-  //   }
-  // }, [capturedImage, selectedCrop, router]);
-
   const handleBack = useCallback(() => {
     router.back();
   }, [router]);
@@ -80,12 +42,13 @@ export function useScannerState() {
 
   // ======================================
   const { userId } = useGlobalContext();
-
+  
   // console.log("Current selected crop:", selectedCrop.name.toLowerCase());  
   // console.log("Captured image:", capturedImage);
   // console.log("userId:", userId);
 
 
+  // ========================================================
   //=== call model according to selected crop ===
  const handleAnalyzeCrop = async () => {
   setAnalyzing(true);
@@ -130,7 +93,7 @@ export function useScannerState() {
     const predictionResponse = await axios.post(url, formData);
     // 🚫 Removed manual headers
 
-    console.log("Prediction response:", predictionResponse.data); // confidence, crop, prediction
+    // console.log("Prediction response:", predictionResponse.data); // confidence, crop, prediction
 
     // Upload image to Cloudinary via API route
     const uploadFormData = new FormData();
@@ -151,7 +114,8 @@ export function useScannerState() {
         disease: predictionResponse.data.prediction || null,
         confidence: predictionResponse.data.confidence || 0,
       });
-    console.log("Suggestion response:", suggestion.data.suggestion);
+
+    // console.log("Suggestion response:", suggestion.data.suggestion);
 
     // store data in database (with error handling)
     let storedSuccessfully = false;
@@ -164,7 +128,7 @@ export function useScannerState() {
         imageUrl: imageResponse.data.secure_url,
         suggestion: suggestion.data.suggestion || null,
       });
-      console.log("Analysis data stored:", analysisData.data);
+      // console.log("Analysis data stored:", analysisData.data);
       storedSuccessfully = true;
     } catch (dbError) {
       console.error("Database storage error:", dbError);
@@ -186,7 +150,7 @@ export function useScannerState() {
     localStorage.setItem("scanResult", JSON.stringify(resultData));
 
     // Navigate to results page with the analysis result
-    // router.push("/dashboard/results");
+    router.push("/dashboard/results");
 
   } catch (err) {
     setError("Analysis failed. Please try again.");

@@ -5,13 +5,37 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { DiseaseInfo } from "./types";
+import { ScanResult, DiseaseInfo } from "./types";
 
 interface PreventionGuideProps {
-  diseaseInfo: DiseaseInfo;
+  scanResult?: ScanResult;
+  diseaseInfo?: DiseaseInfo;
 }
 
-export function PreventionGuide({ diseaseInfo }: PreventionGuideProps) {
+export function PreventionGuide({
+  scanResult,
+  diseaseInfo,
+}: PreventionGuideProps) {
+  const longTermCareNotes = scanResult?.suggestion?.longTermCare?.notes;
+  const hasPrevention =
+    longTermCareNotes?.length || diseaseInfo?.prevention?.length;
+  const hasCauses = diseaseInfo?.causes?.length;
+
+  if (!hasPrevention && !hasCauses) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base sm:text-lg">
+            Prevention for Future
+          </CardTitle>
+          <CardDescription className="text-sm">
+            No specific prevention information available
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -24,26 +48,44 @@ export function PreventionGuide({ diseaseInfo }: PreventionGuideProps) {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div>
-            <h4 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">
-              Disease Causes
-            </h4>
-            <ul className="space-y-1 text-sm text-gray-600">
-              {diseaseInfo.causes.map((cause, index) => (
-                <li key={index}>• {cause}</li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">
-              Prevention Methods
-            </h4>
-            <ul className="space-y-1 text-sm text-gray-600">
-              {diseaseInfo.prevention.map((method, index) => (
-                <li key={index}>• {method}</li>
-              ))}
-            </ul>
-          </div>
+          {longTermCareNotes && longTermCareNotes.length > 0 && (
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">
+                Long-Term Care Notes
+              </h4>
+              <ul className="space-y-1 text-sm text-gray-600">
+                {longTermCareNotes.map((note, index) => (
+                  <li key={index}>• {note}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {diseaseInfo?.causes && diseaseInfo.causes.length > 0 && (
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">
+                Disease Causes
+              </h4>
+              <ul className="space-y-1 text-sm text-gray-600">
+                {diseaseInfo.causes.map((cause, index) => (
+                  <li key={index}>• {cause}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {diseaseInfo?.prevention && diseaseInfo.prevention.length > 0 && (
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">
+                Prevention Methods
+              </h4>
+              <ul className="space-y-1 text-sm text-gray-600">
+                {diseaseInfo.prevention.map((method, index) => (
+                  <li key={index}>• {method}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

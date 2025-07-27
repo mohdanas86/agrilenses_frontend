@@ -48,13 +48,20 @@ export default function ResultsPage() {
             {scanResult.isHealthy ? (
               <HealthyPlantAdvice />
             ) : (
-              diseaseInfo && (
-                <>
-                  <ImmediateAction diseaseInfo={diseaseInfo} />
-                  <TreatmentOptions diseaseInfo={diseaseInfo} />
-                  <PreventionGuide diseaseInfo={diseaseInfo} />
-                </>
-              )
+              <>
+                <ImmediateAction
+                  scanResult={scanResult}
+                  diseaseInfo={diseaseInfo || undefined}
+                />
+                <TreatmentOptions
+                  scanResult={scanResult}
+                  diseaseInfo={diseaseInfo || undefined}
+                />
+                <PreventionGuide
+                  scanResult={scanResult}
+                  diseaseInfo={diseaseInfo || undefined}
+                />
+              </>
             )}
 
             <ActionButtons />
