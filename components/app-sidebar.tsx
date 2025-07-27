@@ -156,7 +156,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <Leaf className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Agri-Lens</h1>
+            <h1 className="text-xl font-bold text-gray-900">AgriLenses</h1>
             <p className="text-xs text-green-600 font-medium">v1.0.1</p>
           </div>
         </div>

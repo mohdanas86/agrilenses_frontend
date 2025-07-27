@@ -102,7 +102,7 @@ export default function AgriLensDashboard() {
         {/* Welcome Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            Welcome to Agri-Lens
+            Welcome to AgriLenses
           </h1>
           <p className="text-md text-gray-600">
             AI-powered crop disease detection for healthier harvests
@@ -132,7 +132,7 @@ export default function AgriLensDashboard() {
               <Button
                 size="lg"
                 className="w-full bg-white text-green-700 hover:bg-green-50 font-semibold text-base mt-4 py-6 flex justify-between items-center"
-                onClick={() => router.push("/scanner")}
+                onClick={() => router.push("/dashboard/scanner")}
               >
                 Start Diagnosis
                 <ChevronRight className="h-5 w-5" />
@@ -273,13 +273,6 @@ export default function AgriLensDashboard() {
               </ul>
             </div>
           </div>
-        </div>
-
-        {/* Footer */}
-        <div>
-          <Button variant="outline" onClick={generate}>
-            Generate Report
-          </Button>
         </div>
       </main>
     </div>

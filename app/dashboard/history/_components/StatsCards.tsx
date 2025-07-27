@@ -71,16 +71,22 @@ const MetricCard = memo(
       <Card
         className={`border ${styles.border} shadow-sm bg-white hover:shadow-md transition-shadow duration-200`}
       >
-        <CardContent className="p-6">
-          <div className={`p-3 ${styles.bg} rounded-lg mb-4 w-fit`}>
-            <Icon className={`h-6 w-6 ${styles.icon}`} />
+        <CardContent className="p-4 sm:p-6">
+          <div
+            className={`p-2 sm:p-3 ${styles.bg} rounded-lg mb-3 sm:mb-4 w-fit`}
+          >
+            <Icon className={`h-5 w-5 sm:h-6 sm:w-6 ${styles.icon}`} />
           </div>
 
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-gray-600">{title}</p>
-            <p className={`text-3xl font-bold ${styles.value}`}>{value}</p>
+          <div className="space-y-1 sm:space-y-2">
+            <p className="text-xs sm:text-sm font-medium text-gray-600">
+              {title}
+            </p>
+            <p className={`text-2xl sm:text-3xl font-bold ${styles.value}`}>
+              {value}
+            </p>
             {description && (
-              <p className="text-sm text-gray-500">{description}</p>
+              <p className="text-xs sm:text-sm text-gray-500">{description}</p>
             )}
           </div>
         </CardContent>
@@ -124,7 +130,7 @@ export const StatsCards = memo(({ stats }: StatsCardsProps) => {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
       {statItems.map((item, index) => (
         <MetricCard
           key={index}
