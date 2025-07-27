@@ -21,4 +21,5 @@ export interface AnalysisData {
   confidence: number;
   isHealthy: boolean;
   timestamp: string;
+  suggestion?: []
 }

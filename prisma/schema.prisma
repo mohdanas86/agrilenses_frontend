@@ -9,6 +9,7 @@ datasource db {
 
 model User {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  clerkId      String   @unique // Clerk user ID
   name         String
   email        String   @unique
   phone        String?
@@ -16,27 +17,52 @@ model User {
   profileImage String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  scans        Scan[]
 }
 
 model Scan {
-  id           String       @id @default(auto()) @map("_id") @db.ObjectId
-  userId       String       @db.ObjectId
-  user         User         @relation(fields: [userId], references: [id])
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
+  clerkUserId  String      // Store Clerk user ID directly
   plantName    String
   disease      String
   confidence   Float
   imageUrl     String
-  suggestions  Suggestion[]
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  suggestion   Suggestion?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 }
 
 type Suggestion {
-  disease    String
-  reason     String
-  treatment  String
-  care       String
+  identification    Identification
+  managementPlan    ManagementPlan
+  longTermCare      LongTermCare
+  warning           String
+}
+
+type Identification {
+  diseaseName String
+  plant       String
+  confidence  Int
+  symptoms    String[]
+}
+
+type ManagementPlan {
+  culturalAndPreventative String[]
+  treatments              Treatments
+}
+
+type Treatments {
+  organicOptions  TreatmentOption[]
+  chemicalOptions TreatmentOption[]
+}
+
+type TreatmentOption {
+  activeIngredient String
+  description      String
+  application      String
+}
+
+type LongTermCare {
+  notes String[]
 }
 
 type Address {
