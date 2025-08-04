@@ -1,290 +1,183 @@
-// "use client";
+"use client";
 
-// import {
-//   ArrowLeft,
-//   ArrowRight,
-//   Camera,
-//   Leaf,
-//   Shield,
-//   BarChart3,
-// } from "lucide-react";
-// import React, { useState, useEffect } from "react";
-// import { Button } from "@/components/ui/button";
-// import { Badge } from "@/components/ui/badge";
+import { Camera, Leaf, BarChart3, CheckCircle } from "lucide-react";
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import Link from "next/link";
 
-// // Crop models data
-// const cropModels = [
-//   {
-//     id: "tomato",
-//     name: "Tomato",
-//     emoji: "🍅",
-//     description: "Detects common tomato diseases with advanced AI algorithms",
-//     accuracy: "96.2%",
-//     diseases: [
-//       "Tomato Bacterial spot",
-//       "Tomato Early blight",
-//       "Tomato Late blight",
-//       "Tomato Leaf Mold",
-//       "Tomato Septoria leaf spot",
-//       "Tomato Spider mites Two-spotted spider mite",
-//       "Tomato Target Spot",
-//       "Tomato Tomato Yellow Leaf Curl Virus",
-//       "Tomato Tomato mosaic virus",
-//       "Tomato healthy",
-//     ],
-//     bgGradient: "from-red-500 to-orange-500",
-//     pattern: "bg-gradient-to-br from-red-500/10 to-orange-500/10",
-//   },
-//   {
-//     id: "potato",
-//     name: "Potato",
-//     emoji: "🥔",
-//     description: "Identifies potato plant diseases with precision diagnostics",
-//     accuracy: "94.8%",
-//     diseases: ["Late Blight", "Early Blight"],
-//     bgGradient: "from-yellow-600 to-amber-600",
-//     pattern: "bg-gradient-to-br from-yellow-600/10 to-amber-600/10",
-//   },
-// ];
+// Available crop models
+const availableModels = [
+  {
+    id: "tomato",
+    name: "Tomato Disease Detection",
+    emoji: "🍅",
+    description:
+      "Detect and identify common tomato plant diseases with high accuracy AI analysis",
+    accuracy: "96.2%",
+    diseases: [
+      "Bacterial Spot",
+      "Early Blight",
+      "Late Blight",
+      "Leaf Mold",
+      "Septoria Leaf Spot",
+      "Target Spot",
+      "Yellow Leaf Curl Virus",
+      "Mosaic Virus",
+      "Healthy Plant",
+    ],
+    status: "Active",
+    bgColor: "bg-red-50",
+    borderColor: "border-red-200",
+    accentColor: "text-red-600",
+  },
+  {
+    id: "potato",
+    name: "Potato Disease Detection",
+    emoji: "🥔",
+    description:
+      "Advanced AI model for detecting potato plant diseases and health conditions",
+    accuracy: "94.8%",
+    diseases: ["Late Blight", "Early Blight", "Healthy Plant"],
+    status: "Active",
+    bgColor: "bg-yellow-50",
+    borderColor: "border-yellow-200",
+    accentColor: "text-yellow-600",
+  },
+];
 
-// const Models = () => {
-//   const [currentSlide, setCurrentSlide] = useState(0);
-//   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+const Models = () => {
+  return (
+    <section className="py-16 bg-gradient-to-br from-slate-50 to-white">
+      <div className="max-w-7xl mx-auto px-6">
+        {/* Section Header */}
+        <div className="text-center mb-12">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Leaf className="h-6 w-6 text-green-600" />
+            <span className="text-sm font-medium text-green-600 uppercase tracking-wide">
+              AI Models
+            </span>
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            Available Detection Models
+          </h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Choose from our trained AI models to detect diseases in your crops
+            with high accuracy
+          </p>
+        </div>
 
-//   // Auto-rotate carousel
-//   useEffect(() => {
-//     if (!isAutoPlaying) return;
+        {/* Models Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+          {availableModels.map((model) => (
+            <Card
+              key={model.id}
+              className={`${model.bgColor} ${model.borderColor} border-2 hover:shadow-lg transition-all duration-300`}
+            >
+              <CardHeader className="space-y-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="text-4xl">{model.emoji}</div>
+                    <div>
+                      <CardTitle className="text-xl text-gray-900">
+                        {model.name}
+                      </CardTitle>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge
+                          variant="secondary"
+                          className="bg-green-100 text-green-800 text-xs"
+                        >
+                          <CheckCircle className="h-3 w-3 mr-1" />
+                          {model.status}
+                        </Badge>
+                        <Badge variant="outline" className="text-xs">
+                          <BarChart3 className="h-3 w-3 mr-1" />
+                          {model.accuracy}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <CardDescription className="text-gray-700">
+                  {model.description}
+                </CardDescription>
+              </CardHeader>
 
-//     const interval = setInterval(() => {
-//       setCurrentSlide((prev) => (prev + 1) % cropModels.length);
-//     }, 5000);
+              <CardContent className="space-y-4">
+                {/* Disease Detection Capabilities */}
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                    <Leaf className="h-4 w-4 text-green-600" />
+                    Detects {model.diseases.length} Conditions
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {model.diseases.slice(0, 6).map((disease, index) => (
+                      <Badge
+                        key={index}
+                        variant="outline"
+                        className="text-xs bg-white"
+                      >
+                        {disease}
+                      </Badge>
+                    ))}
+                    {model.diseases.length > 6 && (
+                      <Badge variant="outline" className="text-xs bg-white">
+                        +{model.diseases.length - 6} more
+                      </Badge>
+                    )}
+                  </div>
+                </div>
 
-//     return () => clearInterval(interval);
-//   }, [isAutoPlaying]);
+                {/* Action Button */}
+                <Link href={`/dashboard/scanner`}>
+                  <Button className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-medium">
+                    <Camera className="h-4 w-4 mr-2" />
+                    Scan {model.name.split(" ")[0]} Plants
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
 
-//   const nextSlide = () => {
-//     setCurrentSlide((prev) => (prev + 1) % cropModels.length);
-//     setIsAutoPlaying(false);
-//   };
+        {/* Call to Action */}
+        <div className="text-center bg-white rounded-2xl p-8 shadow-sm border">
+          <div className="max-w-2xl mx-auto">
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              Ready to Protect Your Crops?
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Start using our AI-powered disease detection system to keep your
+              plants healthy and maximize your harvest.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/dashboard/scanner">
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-8"
+                >
+                  <Camera className="h-5 w-5 mr-2" />
+                  Start Scanning Now
+                </Button>
+              </Link>
+              <Link href="/dashboard">
+                <Button variant="outline" size="lg" className="px-8">
+                  View Dashboard
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
 
-//   const prevSlide = () => {
-//     setCurrentSlide(
-//       (prev) => (prev - 1 + cropModels.length) % cropModels.length
-//     );
-//     setIsAutoPlaying(false);
-//   };
-
-//   const currentModel = cropModels[currentSlide];
-
-//   return (
-//     <React.Fragment>
-//       <div className="heroSection relative overflow-hidden bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 min-h-[80vh] flex items-center">
-//         {/* Background Pattern */}
-//         <div className="absolute inset-0 opacity-5">
-//           <svg
-//             className="w-full h-full"
-//             viewBox="0 0 100 100"
-//             xmlns="http://www.w3.org/2000/svg"
-//           >
-//             <defs>
-//               <pattern
-//                 id="grain"
-//                 x="0"
-//                 y="0"
-//                 width="20"
-//                 height="20"
-//                 patternUnits="userSpaceOnUse"
-//               >
-//                 <circle cx="10" cy="10" r="1" fill="currentColor" />
-//               </pattern>
-//             </defs>
-//             <rect width="100" height="100" fill="url(#grain)" />
-//           </svg>
-//         </div>
-
-//         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
-//           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-//             {/* Left Side - Content */}
-//             <div className="space-y-8 animate-fade-in">
-//               {/* Main Heading */}
-//               <div className="space-y-4">
-//                 <div className="flex items-center gap-3 mb-4">
-//                   <div className="flex items-center gap-2 bg-green-100 px-4 py-2 rounded-full">
-//                     <Leaf className="h-4 w-4 text-green-600" />
-//                     <span className="text-sm font-medium text-green-700">
-//                       AI-Powered Agriculture
-//                     </span>
-//                   </div>
-//                 </div>
-
-//                 <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-//                   Smart Disease
-//                   <span
-//                     className={`bg-gradient-to-r ${currentModel.bgGradient} bg-clip-text text-transparent block`}
-//                   >
-//                     Detection
-//                   </span>
-//                 </h1>
-
-//                 <p className="text-xl text-gray-600 leading-relaxed max-w-lg">
-//                   Advanced AI models for precise crop disease identification.
-//                   Protect your harvest with cutting-edge technology.
-//                 </p>
-//               </div>
-
-//               {/* Current Model Details */}
-//               <div
-//                 className={`${currentModel.pattern} rounded-2xl p-6 border border-gray-200/50 backdrop-blur-sm transition-all duration-500`}
-//               >
-//                 <div className="flex items-start gap-4">
-//                   <div className="text-4xl">{currentModel.emoji}</div>
-//                   <div className="flex-1">
-//                     <div className="flex items-center gap-3 mb-2">
-//                       <h3 className="text-2xl font-bold text-gray-900">
-//                         {currentModel.name}
-//                       </h3>
-//                       <Badge
-//                         variant="secondary"
-//                         className="bg-green-100 text-green-800 font-semibold"
-//                       >
-//                         <BarChart3 className="h-3 w-3 mr-1" />
-//                         {currentModel.accuracy}
-//                       </Badge>
-//                     </div>
-//                     <p className="text-gray-700 mb-4">
-//                       {currentModel.description}
-//                     </p>
-
-//                     <div className="space-y-3">
-//                       <div className="flex items-center gap-2">
-//                         <Shield className="h-4 w-4 text-green-600" />
-//                         <span className="text-sm font-medium text-gray-800">
-//                           Detects {currentModel.diseases.length} conditions
-//                         </span>
-//                       </div>
-
-//                       <div className="flex flex-wrap gap-2">
-//                         {currentModel.diseases
-//                           .slice(0, 3)
-//                           .map((disease, index) => (
-//                             <Badge
-//                               key={index}
-//                               variant="outline"
-//                               className="text-xs"
-//                             >
-//                               {disease.replace(`${currentModel.name} `, "")}
-//                             </Badge>
-//                           ))}
-//                         {currentModel.diseases.length > 3 && (
-//                           <Badge variant="outline" className="text-xs">
-//                             +{currentModel.diseases.length - 3} more
-//                           </Badge>
-//                         )}
-//                       </div>
-//                     </div>
-//                   </div>
-//                 </div>
-//               </div>
-
-//               {/* CTA Button */}
-//               <div className="flex flex-col sm:flex-row gap-4">
-//                 <Button
-//                   size="lg"
-//                   className={`bg-gradient-to-r ${currentModel.bgGradient} hover:opacity-90 text-white font-semibold text-lg px-8 py-6 rounded-xl shadow-lg transition-all duration-300 flex items-center gap-3`}
-//                 >
-//                   <Camera className="h-5 w-5" />
-//                   Start Scanning
-//                 </Button>
-
-//                 <Button
-//                   variant="outline"
-//                   size="lg"
-//                   className="font-semibold text-lg px-8 py-6 rounded-xl border-2 hover:bg-gray-50 transition-all duration-300"
-//                 >
-//                   Learn More
-//                 </Button>
-//               </div>
-
-//               {/* Carousel Indicators */}
-//               <div className="flex items-center gap-3">
-//                 {cropModels.map((_, index) => (
-//                   <button
-//                     key={index}
-//                     onClick={() => {
-//                       setCurrentSlide(index);
-//                       setIsAutoPlaying(false);
-//                     }}
-//                     className={`w-3 h-3 rounded-full transition-all duration-300 ${
-//                       index === currentSlide
-//                         ? `bg-gradient-to-r ${currentModel.bgGradient}`
-//                         : "bg-gray-300 hover:bg-gray-400"
-//                     }`}
-//                   />
-//                 ))}
-//               </div>
-//             </div>
-
-//             {/* Right Side - Visual Carousel */}
-//             <div className="relative">
-//               <div className="relative h-96 lg:h-[500px] overflow-hidden rounded-3xl shadow-2xl">
-//                 {cropModels.map((model, index) => (
-//                   <div
-//                     key={model.id}
-//                     className={`absolute inset-0 transition-all duration-700 ease-in-out ${
-//                       index === currentSlide
-//                         ? "opacity-100 scale-100"
-//                         : "opacity-0 scale-95"
-//                     }`}
-//                   >
-//                     <div
-//                       className={`h-full bg-gradient-to-br ${model.bgGradient} flex items-center justify-center relative overflow-hidden`}
-//                     >
-//                       {/* Background Pattern */}
-//                       <div className="absolute inset-0 opacity-20">
-//                         <div className="absolute top-10 left-10 w-20 h-20 bg-white/20 rounded-full" />
-//                         <div className="absolute bottom-20 right-10 w-32 h-32 bg-white/10 rounded-full" />
-//                         <div className="absolute top-1/2 right-20 w-16 h-16 bg-white/15 rounded-full" />
-//                       </div>
-
-//                       {/* Main Content */}
-//                       <div className="text-center text-white z-10">
-//                         <div className="text-8xl mb-6 drop-shadow-lg">
-//                           {model.emoji}
-//                         </div>
-//                         <h2 className="text-4xl font-bold mb-4 drop-shadow-md">
-//                           {model.name}
-//                         </h2>
-//                         <div className="bg-white/20 backdrop-blur-sm rounded-full px-6 py-2 inline-block">
-//                           <span className="text-lg font-semibold">
-//                             {model.accuracy} Accuracy
-//                           </span>
-//                         </div>
-//                       </div>
-//                     </div>
-//                   </div>
-//                 ))}
-//               </div>
-
-//               {/* Carousel Controls */}
-//               <button
-//                 onClick={prevSlide}
-//                 className="absolute left-4 top-1/2 -translate-y-1/2 z-30 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-300 group"
-//               >
-//                 <ArrowLeft className="h-6 w-6 text-gray-700 group-hover:text-gray-900" />
-//               </button>
-
-//               <button
-//                 onClick={nextSlide}
-//                 className="absolute right-4 top-1/2 -translate-y-1/2 z-30 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-300 group"
-//               >
-//                 <ArrowRight className="h-6 w-6 text-gray-700 group-hover:text-gray-900" />
-//               </button>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </React.Fragment>
-//   );
-// };
-
-// export default Models;
+export default Models;

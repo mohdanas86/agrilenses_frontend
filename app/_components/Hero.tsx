@@ -15,11 +15,6 @@ const Hero = () => {
         />
         {/* Gradient overlay for better text readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black/60" />
-
-        {/* Logo/Branding overlay on image */}
-        <div className="absolute top-8 left-8 z-10">
-          <div className="text-white font-bold text-2xl">PlantAI</div>
-        </div>
       </div>
 
       {/* Content Section - 30% */}

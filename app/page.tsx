@@ -5,6 +5,8 @@ import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Header from "./_components/Header";
 import Hero from "./_components/Hero";
+import Footer from "./_components/Footer";
+import Models from "./_components/Models";
 
 const HomePage = () => {
   const { isSignedIn, isLoaded } = useUser();
@@ -40,6 +42,9 @@ const HomePage = () => {
 
       {/* Hero Section */}
       <Hero />
+      <Models />
+
+      <Footer />
     </div>
   );
 };
