@@ -21,9 +21,6 @@ export const metadata: Metadata = {
     icon: "/favicon.ico",
   },
   manifest: "/manifest.json",
-  other: {
-    "facebook-domain-verification": "2r0ibpj9j7w4gh646au0gagh3syv79",
-  },
 };
 
 export const viewport: Viewport = {
@@ -39,7 +36,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="light">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

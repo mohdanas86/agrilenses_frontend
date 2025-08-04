@@ -53,17 +53,17 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-4">
+        <div className="flex justify-between items-center py-2">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3 group">
             <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-2.5 group-hover:shadow-lg transition-all duration-200">
-              <Leaf className="h-7 w-7 text-white" />
+              <Leaf className="h-4 w-4 lg:h-7 lg:w-7 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
+              <h1 className="lg:text-2xl text-xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
                 AgriLenses
               </h1>
-              <p className="text-sm text-gray-500 font-medium">
+              <p className="text-sm text-gray-500 font-medium hidden lg:inline">
                 Smart Crop Health Monitor
               </p>
             </div>

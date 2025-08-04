@@ -2,6 +2,7 @@
 
 import React from "react";
 import { SignUp } from "@clerk/nextjs";
+import { useSearchParams } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -12,6 +13,9 @@ import {
 import { Leaf } from "lucide-react";
 
 const SignUpPage = () => {
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get('redirect_url') || '/dashboard';
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100 dark:from-gray-900 dark:to-gray-800 p-4">
       <Card className="w-full max-w-md shadow-xl border-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm">
@@ -49,8 +53,8 @@ const SignUpPage = () => {
                   "text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 font-medium",
               },
             }}
-            forceRedirectUrl="/dashboard"
-            signInForceRedirectUrl="/dashboard"
+            forceRedirectUrl={redirectUrl}
+            signInForceRedirectUrl={redirectUrl}
             signInUrl="/signin"
           />
         </CardContent>

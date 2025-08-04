@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Header from "./_components/Header";
+import Hero from "./_components/Hero";
 
 const HomePage = () => {
   const { isSignedIn, isLoaded } = useUser();
@@ -34,30 +35,11 @@ const HomePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
+    <div className="min-h-screen">
       <Header />
 
       {/* Hero Section */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-            Smart Plant Health
-            <span className="block text-green-600">Monitoring System</span>
-          </h1>
-          <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Detect plant diseases early with AI-powered image analysis. Protect
-            your crops and maximize your harvest with real-time health
-            monitoring.
-          </p>
-
-          {/* CTA Section will be here */}
-          <div className="mt-12">
-            <p className="text-gray-500">
-              Join thousands of farmers protecting their crops with Agri-Lens
-            </p>
-          </div>
-        </div>
-      </main>
+      <Hero />
     </div>
   );
 };
