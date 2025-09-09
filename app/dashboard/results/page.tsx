@@ -24,109 +24,15 @@ import {
   TrendingUp,
   Award,
   ArrowLeft,
+  Star,
+  ThermometerSun,
+  Droplets,
+  Wind,
+  MapPin,
 } from "lucide-react";
 import Link from "next/link";
 import { BackButton } from "@/components/BackButton";
-
-// Define types for the scan data
-interface TreatmentOption {
-  activeIngredient: string;
-  description: string;
-  application: string;
-}
-
-interface ScanData {
-  crop: string;
-  image: string;
-  disease: string;
-  confidence: number;
-  isHealthy: boolean;
-  suggestion: {
-    identification: {
-      diseaseName: string;
-      plant: string;
-      confidence: number;
-      symptoms: string[];
-    };
-    managementPlan: {
-      culturalAndPreventative: string[];
-      treatments: {
-        organicOptions: TreatmentOption[];
-        chemicalOptions: TreatmentOption[];
-      };
-    };
-    longTermCare: {
-      notes: string[];
-    };
-    warning: string;
-  };
-  timestamp: string;
-}
-
-// Sample data structure - replace with actual localStorage data
-const sampleData: ScanData = {
-  crop: "Potato",
-  image:
-    "https://res.cloudinary.com/dxjiwyxqb/image/upload/v1753595467/plant-disease/Potato/h4th0nanau0uj48fpdmg.jpg",
-  disease: "Potato___Late_blight",
-  confidence: 0.9991913437843323,
-  isHealthy: false,
-  suggestion: {
-    identification: {
-      diseaseName: "Potato___Late_blight",
-      plant: "Potato",
-      confidence: 100,
-      symptoms: [
-        "Water-soaked, dark spots on leaves",
-        "White, cottony growth on leaf undersides",
-        "Lesions on stems and petioles",
-      ],
-    },
-    managementPlan: {
-      culturalAndPreventative: [
-        "Immediately remove and destroy infected plant material",
-        "Avoid overhead watering to reduce humidity",
-        "Ensure good air circulation around plants",
-      ],
-      treatments: {
-        organicOptions: [
-          {
-            activeIngredient: "Copper hydroxide",
-            description:
-              "Copper hydroxide disrupts fungal cell walls and prevents spore germination",
-            application:
-              "Apply as a foliar spray according to label instructions",
-          },
-        ],
-        chemicalOptions: [
-          {
-            activeIngredient: "Mefenoxam",
-            description:
-              "Mefenoxam provides preventative and curative control against late blight",
-            application:
-              "Apply as a foliar spray during early disease development",
-          },
-          {
-            activeIngredient: "Chlorothalonil",
-            description:
-              "Chlorothalonil is a broad-spectrum fungicide effective against late blight",
-            application:
-              "Apply as a foliar spray preventatively, rotate with other fungicides",
-          },
-        ],
-      },
-    },
-    longTermCare: {
-      notes: [
-        "Practice crop rotation with non-solanaceous crops",
-        "Use certified disease-free seed potatoes",
-        "Monitor plants regularly for early detection",
-      ],
-    },
-    warning: "Always read and follow product label instructions",
-  },
-  timestamp: "2025-07-27T05:51:22.151Z",
-};
+import { ScanResult } from "../scanner/_components/types";
 
 const MetricCard = ({
   icon: Icon,
@@ -195,7 +101,8 @@ const MetricCard = ({
                 <div
                   className="h-1.5 rounded-full bg-gray-600 transition-all duration-500"
                   style={{ width: `${showProgress}%` }}
-                />
+                >
+                </div>
               </div>
               <p className="text-xs text-gray-500">Confidence Level</p>
             </div>
@@ -207,48 +114,69 @@ const MetricCard = ({
 };
 
 export default function ResultPage() {
-  const [scanData, setScanData] = useState<ScanData | null>(null);
+  const [scanData, setScanData] = useState<ScanResult | null>(null);
 
   useEffect(() => {
-    // Get data from localStorage or use sample data
-    const storedData = localStorage.getItem("scanResult");
-    if (storedData) {
+    // Try to get scan result from session storage
+    const storedResult = sessionStorage.getItem('latestScanResult');
+    if (storedResult) {
       try {
-        setScanData(JSON.parse(storedData));
+        const result = JSON.parse(storedResult);
+        setScanData(result);
       } catch (error) {
-        console.error("Error parsing stored data:", error);
-        setScanData(sampleData);
+        console.error('Failed to parse scan result:', error);
       }
-    } else {
-      setScanData(sampleData);
     }
   }, []);
 
   if (!scanData) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading analysis results...</p>
+      <div className="min-h-screen bg-gray-50 text-gray-900 p-4 md:p-8 font-sans">
+        <div className="max-w-4xl mx-auto">
+          <Card className="border border-gray-200 shadow-sm bg-white">
+            <CardContent className="p-8 text-center">
+              <div className="space-y-4">
+                <FlaskConical className="h-16 w-16 text-gray-400 mx-auto" />
+                <h2 className="text-2xl font-bold text-gray-900">No Scan Results Available</h2>
+                <p className="text-gray-600">
+                  Please perform a scan first to see the results here.
+                </p>
+                <Link href="/dashboard/scanner">
+                  <Button className="bg-green-600 hover:bg-green-700 text-white">
+                    <ImagePlus className="w-4 h-4 mr-2" />
+                    Start New Scan
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
   }
 
-  const formatDiseaseName = (disease: string) => {
-    return disease.replace(/___/g, " - ").replace(/_/g, " ");
-  };
-
-  const formatConfidence = (confidence: number) => {
-    return Math.round(confidence * 100);
-  };
-
   const formatDate = (timestamp: string) => {
     return new Date(timestamp).toLocaleDateString("en-US", {
-      month: "short",
+      weekday: "long",
+      month: "long",
       day: "numeric",
       year: "numeric",
     });
+  };
+
+  const getConfidenceType = (confidence: number) => {
+    if (confidence >= 90) return "success";
+    if (confidence >= 70) return "warning";
+    return "error";
+  };
+
+  const getSeverityColor = (severity?: string) => {
+    switch (severity?.toLowerCase()) {
+      case "low": return "bg-green-100 text-green-800";
+      case "medium": return "bg-yellow-100 text-yellow-800";
+      case "high": return "bg-red-100 text-red-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
   };
 
   return (
@@ -277,18 +205,23 @@ export default function ResultPage() {
                   <div className="flex items-center space-x-2">
                     <div
                       className={`w-2 h-2 rounded-full ${
-                        scanData.isHealthy ? "bg-green-500" : "bg-red-500"
+                        scanData.disease === null || scanData.disease === "Healthy" 
+                          ? "bg-green-500" 
+                          : "bg-red-500"
                       }`}
                     />
                     <span className="text-sm font-medium text-gray-700">
-                      {scanData.isHealthy
+                      {scanData.disease === null || scanData.disease === "Healthy"
                         ? "Healthy Plant"
                         : "Disease Detected"}
                     </span>
                   </div>
                   <div className="w-1 h-1 bg-gray-300 rounded-full" />
                   <span className="text-sm text-gray-500">
-                    {formatDate(scanData.timestamp)}
+                    {scanData.analysis?.timestamp ? 
+                      formatDate(scanData.analysis.timestamp) : 
+                      'Just now'
+                    }
                   </span>
                 </div>
               </div>
@@ -296,364 +229,211 @@ export default function ResultPage() {
               <div className="flex flex-wrap gap-3">
                 <BackButton title="" />
                 <Link href="/dashboard/history">
-                  <Button
-                    variant="outline"
-                    className="border-gray-300 text-gray-700 hover:bg-gray-50"
-                  >
+                  <Button variant="outline" className="border-gray-200 hover:bg-gray-50">
                     <History className="w-4 h-4 mr-2" />
-                    History
+                    View History
                   </Button>
                 </Link>
                 <Link href="/dashboard/scanner">
-                  <Button
-                    variant="outline"
-                    className="border-gray-300 text-gray-700 hover:bg-gray-50"
-                  >
+                  <Button className="bg-green-600 hover:bg-green-700 text-white">
                     <ImagePlus className="w-4 h-4 mr-2" />
-                    Scan Again
+                    New Scan
                   </Button>
                 </Link>
-
-                <Button className="bg-gray-900 hover:bg-gray-800 text-white">
-                  <Share2 className="w-4 h-4 mr-2" />
-                  Share Report
-                </Button>
               </div>
             </div>
           </CardContent>
         </Card>
       </header>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <MetricCard
-          icon={Leaf}
-          label="Crop Type"
-          value={scanData.crop}
-          type="neutral"
-        />
-        <MetricCard
-          icon={AlertTriangle}
-          label="Disease Status"
-          value={
-            scanData.isHealthy ? "Healthy" : formatDiseaseName(scanData.disease)
-          }
-          type={scanData.isHealthy ? "success" : "warning"}
-        />
-        <MetricCard
-          icon={Target}
-          label="Confidence"
-          value={`${formatConfidence(scanData.confidence)}%`}
-          showProgress={formatConfidence(scanData.confidence)}
-          type="neutral"
-        />
-        <MetricCard
-          icon={Calendar}
-          label="Scan Date"
-          value={formatDate(scanData.timestamp)}
-          type="neutral"
-        />
-      </div>
-
-      {/* Main Content */}
-      <div className="grid lg:grid-cols-3 gap-8 mb-8">
-        {/* Image */}
-        <div className="lg:col-span-1">
-          <Card className="border border-gray-200 shadow-sm bg-white overflow-hidden group">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Eye className="h-4 w-4 text-gray-600" />
-                  <CardTitle className="text-lg font-semibold text-gray-900">
-                    Analyzed Image
-                  </CardTitle>
-                </div>
-                <Badge
-                  variant="secondary"
-                  className="bg-gray-100 text-gray-700"
-                >
-                  HD Quality
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="relative">
-                <img
-                  src={scanData.image}
-                  alt={`${scanData.crop} analysis`}
-                  className="w-full h-64 sm:h-80 object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-
-                <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/50 to-transparent">
-                  <div className="flex items-center justify-between text-white text-sm">
-                    <span>Analysis Complete</span>
-                    <span className="opacity-80">Professional Quality</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Symptoms */}
-        <div className="lg:col-span-2">
-          <Card className="border border-gray-200 shadow-sm bg-white h-full">
-            <CardHeader>
-              <div className="flex items-center space-x-2">
-                <Eye className="h-5 w-5 text-gray-600" />
-                <div>
-                  <CardTitle className="text-xl font-bold text-gray-900">
-                    Symptoms Identified
-                  </CardTitle>
-                  <p className="text-gray-600 text-sm">
-                    Key indicators detected by AI analysis
-                  </p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {scanData.suggestion?.identification?.symptoms?.map(
-                (symptom: string, index: number) => (
-                  <div
-                    key={index}
-                    className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors duration-200"
-                  >
-                    <div className="flex-shrink-0 mt-1">
-                      <div className="w-6 h-6 bg-white border border-gray-300 rounded-md flex items-center justify-center">
-                        <AlertTriangle className="h-3 w-3 text-amber-600" />
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-gray-800 text-sm leading-relaxed">
-                        {symptom}
-                      </p>
-                      <div className="flex items-center mt-1 space-x-1">
-                        <CheckCircle className="h-3 w-3 text-green-600" />
-                        <span className="text-xs text-gray-500">
-                          AI Confirmed
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      {/* Management Plan */}
-      <Card className="border border-gray-200 shadow-sm bg-white mb-8">
-        <CardHeader>
-          <div className="flex items-center space-x-2">
-            <ShieldCheck className="h-6 w-6 text-gray-700" />
-            <div>
-              <CardTitle className="text-2xl font-bold text-gray-900">
-                Treatment & Management Plan
-              </CardTitle>
-              <p className="text-gray-600">
-                Comprehensive approach to disease management
-              </p>
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column - Main Results */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Key Metrics */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <MetricCard
+                icon={Target}
+                label="Detection Accuracy"
+                value={`${Math.round(scanData.confidence * 100)}%`}
+                type={getConfidenceType(scanData.confidence * 100)}
+                showProgress={scanData.confidence * 100}
+              />
+              <MetricCard
+                icon={Leaf}
+                label="Crop Type"
+                value={scanData.analysis?.cropType || "Unknown"}
+                type="neutral"
+              />
+              <MetricCard
+                icon={Activity}
+                label="Health Status"
+                value={scanData.disease === null || scanData.disease === "Healthy" ? "Healthy" : "Disease Found"}
+                type={scanData.disease === null || scanData.disease === "Healthy" ? "success" : "error"}
+              />
             </div>
-          </div>
-        </CardHeader>
 
-        <CardContent className="space-y-8">
-          {/* Immediate Actions */}
-          {scanData.suggestion?.managementPlan?.culturalAndPreventative && (
-            <div>
-              <Card className="border border-amber-200 bg-amber-50">
-                <CardContent className="p-6">
-                  <div className="flex items-center space-x-2 mb-4">
-                    <AlertTriangle className="h-5 w-5 text-amber-600" />
-                    <h3 className="text-lg font-semibold text-amber-900">
-                      Immediate Actions Required
+            {/* Disease Information */}
+            {scanData.disease && scanData.disease !== "Healthy" && (
+              <Card className="border border-gray-200 shadow-sm bg-white">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <AlertTriangle className="h-5 w-5 text-red-600" />
+                    <span>Disease Identification</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {scanData.disease.replace(/_/g, " ").replace("___", " - ")}
                     </h3>
-                  </div>
-
-                  <div className="space-y-3">
-                    {scanData.suggestion.managementPlan.culturalAndPreventative.map(
-                      (action: string, index: number) => (
-                        <div
-                          key={index}
-                          className="flex items-start space-x-3 p-3 bg-white rounded-lg border border-amber-100"
-                        >
-                          <div className="flex-shrink-0 mt-0.5">
-                            <div className="w-6 h-6 bg-amber-100 border border-amber-200 rounded-md flex items-center justify-center">
-                              <span className="text-xs font-bold text-amber-700">
-                                {index + 1}
-                              </span>
-                            </div>
-                          </div>
-                          <p className="text-gray-800 text-sm leading-relaxed">
-                            {action}
-                          </p>
-                        </div>
-                      )
+                    {scanData.severity && (
+                      <Badge className={getSeverityColor(scanData.severity)}>
+                        {scanData.severity} Severity
+                      </Badge>
                     )}
                   </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
 
-          {/* Treatment Options */}
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Organic Options */}
-            {scanData.suggestion?.managementPlan?.treatments
-              ?.organicOptions && (
-              <Card className="border border-green-200 bg-green-50">
-                <CardContent className="p-6">
-                  <div className="flex items-center space-x-2 mb-4">
-                    <Leaf className="h-5 w-5 text-green-700" />
+                  {scanData.recommendations && scanData.recommendations.length > 0 && (
                     <div>
-                      <h4 className="font-semibold text-green-900">
-                        Organic Solutions
-                      </h4>
-                      <p className="text-xs text-green-700">
-                        Natural & eco-friendly
-                      </p>
+                      <h4 className="font-medium text-gray-900 mb-2">Recommendations:</h4>
+                      <ul className="space-y-1">
+                        {scanData.recommendations.map((rec, index) => (
+                          <li key={index} className="text-sm text-gray-700 flex items-start space-x-2">
+                            <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            <span>{rec}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    {scanData.suggestion.managementPlan.treatments.organicOptions.map(
-                      (treatment: TreatmentOption, index: number) => (
-                        <div
-                          key={index}
-                          className="p-3 bg-white rounded-lg border border-green-100"
-                        >
-                          <h5 className="font-medium text-green-900 mb-2">
-                            {treatment.activeIngredient}
-                          </h5>
-                          <p className="text-sm text-gray-700 mb-2">
-                            {treatment.description}
-                          </p>
-                          <div className="p-2 bg-green-50 rounded border-l-2 border-green-300">
-                            <p className="text-xs text-green-800">
-                              <strong>Application:</strong>{" "}
-                              {treatment.application}
-                            </p>
-                          </div>
-                        </div>
-                      )
-                    )}
-                  </div>
+                  )}
                 </CardContent>
               </Card>
             )}
 
-            {/* Chemical Options */}
-            {scanData.suggestion?.managementPlan?.treatments
-              ?.chemicalOptions && (
-              <Card className="border border-blue-200 bg-blue-50">
-                <CardContent className="p-6">
-                  <div className="flex items-center space-x-2 mb-4">
-                    <FlaskConical className="h-5 w-5 text-blue-700" />
-                    <div>
-                      <h4 className="font-semibold text-blue-900">
-                        Chemical Solutions
-                      </h4>
-                      <p className="text-xs text-blue-700">
-                        Fast-acting & effective
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    {scanData.suggestion.managementPlan.treatments.chemicalOptions.map(
-                      (treatment: TreatmentOption, index: number) => (
-                        <div
-                          key={index}
-                          className="p-3 bg-white rounded-lg border border-blue-100"
-                        >
-                          <h5 className="font-medium text-blue-900 mb-2">
-                            {treatment.activeIngredient}
-                          </h5>
-                          <p className="text-sm text-gray-700 mb-2">
-                            {treatment.description}
-                          </p>
-                          <div className="p-2 bg-blue-50 rounded border-l-2 border-blue-300">
-                            <p className="text-xs text-blue-800">
-                              <strong>Application:</strong>{" "}
-                              {treatment.application}
-                            </p>
-                          </div>
-                        </div>
-                      )
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-
-          {/* Long-term Care */}
-          {scanData.suggestion?.longTermCare?.notes && (
-            <Card className="border border-purple-200 bg-purple-50">
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-2 mb-4">
-                  <TrendingUp className="h-5 w-5 text-purple-700" />
-                  <h3 className="text-lg font-semibold text-purple-900">
-                    Long-Term Prevention
-                  </h3>
-                </div>
-
-                <div className="space-y-3">
-                  {scanData.suggestion.longTermCare.notes.map(
-                    (note: string, index: number) => (
-                      <div
-                        key={index}
-                        className="flex items-start space-x-3 p-3 bg-white rounded-lg border border-purple-100"
-                      >
-                        <div className="flex-shrink-0 mt-0.5">
-                          <Clock className="h-4 w-4 text-purple-600" />
-                        </div>
-                        <p className="text-gray-800 text-sm leading-relaxed">
-                          {note}
+            {/* Weather Context */}
+            {scanData.analysis?.weather && (
+              <Card className="border border-gray-200 shadow-sm bg-white">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <ThermometerSun className="h-5 w-5 text-blue-600" />
+                    <span>Environmental Context</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 bg-blue-50 rounded-lg">
+                        <ThermometerSun className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Temperature</p>
+                        <p className="text-lg font-bold text-gray-900">
+                          {scanData.analysis?.environmentalFactors?.temperature || 
+                           scanData.analysis?.weather?.temperature || 'N/A'}°C
                         </p>
                       </div>
-                    )
-                  )}
+                    </div>
+
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 bg-blue-50 rounded-lg">
+                        <Droplets className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Humidity</p>
+                        <p className="text-lg font-bold text-gray-900">
+                          {scanData.analysis?.environmentalFactors?.humidity || 
+                           scanData.analysis?.weather?.humidity || 'N/A'}%
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 bg-blue-50 rounded-lg">
+                        <MapPin className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Location</p>
+                        <p className="text-lg font-bold text-gray-900">
+                          {scanData.analysis?.location || 'Unknown'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          {/* Right Column - Image */}
+          <div className="space-y-8">
+            {/* Analyzed Image */}
+            <Card className="border border-gray-200 shadow-sm bg-white">
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Eye className="h-5 w-5 text-gray-600" />
+                  <span>Analyzed Image</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="relative">
+                  <img
+                    src={scanData.analysis?.imageUrl || "/placeholder-plant.jpg"}
+                    alt="Analyzed plant"
+                    className="w-full h-64 object-cover rounded-lg border border-gray-200"
+                  />
+                  <div className="absolute top-2 right-2">
+                    <Button size="sm" variant="outline" className="bg-white/80 backdrop-blur-sm">
+                      <Maximize2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="mt-4 space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-gray-600">Scan ID:</span>
+                    <span className="text-sm text-gray-900 font-mono">
+                      {scanData.id.slice(-8)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-gray-600">Analysis Time:</span>
+                    <span className="text-sm text-gray-900">
+                      {scanData.analysis?.timestamp ? 
+                        new Date(scanData.analysis.timestamp).toLocaleTimeString() : 
+                        'Just now'
+                      }
+                    </span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
-          )}
-        </CardContent>
-      </Card>
 
-      {/* Warning */}
-      {scanData.suggestion?.warning && (
-        <Card className="border border-red-200 bg-red-50 mb-8">
-          <CardContent className="p-6">
-            <div className="flex items-start space-x-4">
-              <div className="p-2 bg-red-100 rounded-lg flex-shrink-0">
-                <AlertTriangle className="h-6 w-6 text-red-600" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-red-900 mb-2">
-                  Important Safety Notice
-                </h3>
-                <p className="text-red-800 leading-relaxed">
-                  {scanData.suggestion.warning}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Footer */}
-      <footer className="text-center text-gray-500 text-sm">
-        <div className="flex items-center justify-center space-x-2 mb-2">
-          <Award className="h-4 w-4" />
-          <span>Powered by Advanced AI Technology</span>
+            {/* Quick Actions */}
+            <Card className="border border-gray-200 shadow-sm bg-white">
+              <CardHeader>
+                <CardTitle>Quick Actions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button variant="outline" className="w-full justify-start border-gray-200 hover:bg-gray-50">
+                  <Download className="w-4 h-4 mr-2" />
+                  Download Report
+                </Button>
+                <Button variant="outline" className="w-full justify-start border-gray-200 hover:bg-gray-50">
+                  <Share2 className="w-4 h-4 mr-2" />
+                  Share Results
+                </Button>
+                <Link href="/dashboard/scanner" className="block">
+                  <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
+                    <ImagePlus className="w-4 h-4 mr-2" />
+                    Scan Another Plant
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-        <p>
-          © 2025 AgriLenses. Professional plant disease detection and
-          management.
-        </p>
-      </footer>
+      </div>
     </div>
   );
 }

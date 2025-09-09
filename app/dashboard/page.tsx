@@ -1,294 +1,403 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { useUser } from "@clerk/nextjs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Camera,
-  Search,
-  Sun,
-  Droplets,
-  Leaf,
-  ChevronRight,
+import { 
+  Leaf, 
+  TrendingUp, 
+  CloudRain, 
+  Activity, 
+  Scan,
+  AlertTriangle,
+  DollarSign,
+  Calendar,
+  MapPin,
   Thermometer,
-  Lightbulb,
+  Droplets,
+  Wind,
+  ArrowRight,
+  FileText,
+  Shield
 } from "lucide-react";
-import { useScannerState } from "./scanner/_components/useScannerState";
-import { cropModels } from "./scanner/_components";
-import { useGlobalContext } from "@/context/GlobalContext";
+import Link from "next/link";
+import apiService from "@/lib/api-service";
 
-// Types
-interface WeatherData {
-  temperature: number;
-  condition: string;
-  humidity: number;
-  location: string;
+// Dashboard Data Types
+interface DashboardData {
+  health?: any;
+  recentScans?: any;
+  weather?: any;
+  marketPrices?: any;
+  analytics?: any;
 }
 
-// Mock data based on the design
-const mockWeather: WeatherData = {
-  temperature: 28,
-  condition: "Partly Cloudy",
-  humidity: 65,
-  location: "Chennai, TN",
-};
+interface QuickStat {
+  title: string;
+  value: string;
+  change: string;
+  trend: 'up' | 'down' | 'neutral';
+  icon: any;
+}
 
-const supportedCrops = [
-  { name: "Tomato", image: "🍅", count: 8, isAval: true },
-  { name: "Potato", image: "🥔", count: 6, isAval: true },
-  { name: "Rice", image: "🌾", count: 4, isAval: false },
-  { name: "Wheat", image: "🌾", count: 3, isAval: false },
-  { name: "Corn", image: "🌽", count: 5, isAval: false },
-  { name: "Bell Pepper", image: "🫑", count: 4, isAval: false },
-  { name: "Apple", image: "🍎", count: 3, isAval: false },
-  { name: "Grape", image: "🍇", count: 2, isAval: false },
-];
+const Dashboard = () => {
+  const { user } = useUser();
+  const [dashboardData, setDashboardData] = useState<DashboardData>({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [location, setLocation] = useState('Delhi'); // Default location
 
-export default function AgriLensDashboard() {
-  const router = useRouter();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentTime, setCurrentTime] = useState<Date | null>(null);
+  useEffect(() => {
+    if (user) {
+      loadDashboardData();
+    }
+  }, [user]);
 
-  // ======================================
-  // update model according to selected crop
-  const { setSelectedCrop } = useGlobalContext();
-
-  const handleCropSelection = (crop: (typeof supportedCrops)[number]) => {
+  const loadDashboardData = async () => {
     try {
-      const matchingModel = cropModels.find(
-        (model) => model.name.toLowerCase() === crop.name.toLowerCase()
-      );
+      setLoading(true);
+      setError(null);
 
-      if (matchingModel) {
-        // Use the global context to set the selected crop
-        setSelectedCrop(matchingModel);
-        // Navigate to scanner page after successful crop selection
-        router.push("/dashboard/scanner");
-      } else {
-        console.log("No matching model found for crop:", crop.name);
-      }
+      // Get user location (in real app, use geolocation API)
+      const userLocation = location || 'Delhi';
+      
+      const data = await apiService.getDashboardData(user?.id || 'demo-user', userLocation);
+      setDashboardData(data);
     } catch (err) {
-      console.log("Error selecting crop model:", err);
+      console.error('Failed to load dashboard:', err);
+      setError('Failed to load dashboard data');
+    } finally {
+      setLoading(false);
     }
   };
 
-  // ======================================
-
-  useEffect(() => {
-    // Set the initial time and start the interval timer
-    const now = new Date();
-    setCurrentTime(now);
-    const timer = setInterval(() => setCurrentTime(new Date()), 60000); // Update every minute
-    return () => clearInterval(timer);
-  }, []);
-
-  const filteredCrops = supportedCrops.filter((crop) =>
-    crop.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const formatTime = (date: Date) => {
-    if (!date) return "";
-    return date
-      .toLocaleDateString("en-US", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-      })
-      .replace(",", " at");
+  // Generate quick stats from dashboard data
+  const getQuickStats = (): QuickStat[] => {
+    const { recentScans, analytics, weather } = dashboardData;
+    
+    return [
+      {
+        title: "Total Scans",
+        value: recentScans?.total || "0",
+        change: "+12%",
+        trend: 'up',
+        icon: Scan
+      },
+      {
+        title: "Healthy Plants",
+        value: `${analytics?.healthy_percentage || 0}%`,
+        change: "+5%",
+        trend: 'up',
+        icon: Leaf
+      },
+      {
+        title: "Today's Temp",
+        value: `${weather?.temperature || '--'}°C`,
+        change: weather?.temperature_trend || "stable",
+        trend: 'neutral',
+        icon: Thermometer
+      },
+      {
+        title: "Market Alert",
+        value: "Good",
+        change: "Prices stable",
+        trend: 'neutral',
+        icon: DollarSign
+      }
+    ];
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 text-gray-800">
-      <main className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Welcome to AgriLenses
-          </h1>
-          <p className="text-md text-gray-600">
-            AI-powered crop disease detection for healthier harvests
-          </p>
-          <p className="text-sm text-gray-500 mt-1">
-            {currentTime ? formatTime(currentTime) : ""}
-          </p>
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i} className="animate-pulse">
+              <CardContent className="p-6">
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
+      </div>
+    );
+  }
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* === LEFT COLUMN === */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Scan Your Crop Card */}
-            <div className="bg-green-600 rounded-xl p-6 text-white shadow-lg">
-              <div className="flex items-start gap-4">
-                <div className="bg-green-500 p-2 rounded-full">
-                  <Camera className="h-6 w-6" />
-                </div>
+  if (error) {
+    return (
+      <div className="p-6">
+        <Card className="border-red-200">
+          <CardContent className="p-6 text-center">
+            <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-red-700 mb-2">Error Loading Dashboard</h3>
+            <p className="text-red-600 mb-4">{error}</p>
+            <Button onClick={loadDashboardData} variant="outline">
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const quickStats = getQuickStats();
+
+  return (
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600">Welcome back, {user?.firstName || 'Farmer'}! Here's your farm overview.</p>
+        </div>
+        <div className="flex gap-3">
+          <Link href="/dashboard/scanner">
+            <Button className="bg-green-600 hover:bg-green-700">
+              <Scan className="h-4 w-4 mr-2" />
+              New Scan
+            </Button>
+          </Link>
+          <Button variant="outline">
+            <FileText className="h-4 w-4 mr-2" />
+            Generate Report
+          </Button>
+        </div>
+      </div>
+
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {quickStats.map((stat, index) => (
+          <Card key={index} className="hover:shadow-lg transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-xl font-semibold">Scan Your Crop</h2>
-                  <p className="text-green-100 mt-1">
-                    Take a photo of your crop leaf for instant disease detection
-                    and treatment recommendations
+                  <p className="text-sm font-medium text-gray-600">{stat.title}</p>
+                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                  <p className={`text-sm ${
+                    stat.trend === 'up' ? 'text-green-600' : 
+                    stat.trend === 'down' ? 'text-red-600' : 'text-gray-600'
+                  }`}>
+                    {stat.change}
                   </p>
                 </div>
+                <div className="p-3 bg-green-100 rounded-full">
+                  <stat.icon className="h-6 w-6 text-green-600" />
+                </div>
               </div>
-              <Button
-                size="lg"
-                className="w-full bg-white text-green-700 hover:bg-green-50 font-semibold text-base mt-4 py-6 flex justify-between items-center"
-                onClick={() => router.push("/dashboard/scanner")}
-              >
-                Start Diagnosis
-                <ChevronRight className="h-5 w-5" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Weather Widget */}
+        <Card className="lg:col-span-1">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CloudRain className="h-5 w-5" />
+              Weather Conditions
+            </CardTitle>
+            <CardDescription>Current weather in {location}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {dashboardData.weather ? (
+              <>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Thermometer className="h-4 w-4 text-orange-500" />
+                    <span>Temperature</span>
+                  </div>
+                  <span className="font-semibold">{dashboardData.weather.temperature}°C</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Droplets className="h-4 w-4 text-blue-500" />
+                    <span>Humidity</span>
+                  </div>
+                  <span className="font-semibold">{dashboardData.weather.humidity}%</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Wind className="h-4 w-4 text-gray-500" />
+                    <span>Conditions</span>
+                  </div>
+                  <Badge variant="outline">{dashboardData.weather.conditions}</Badge>
+                </div>
+                <Link href="/dashboard/weather">
+                  <Button variant="outline" className="w-full mt-4">
+                    View Full Forecast
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <p className="text-gray-500">Weather data loading...</p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Recent Scans */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Activity className="h-5 w-5" />
+              Recent Disease Scans
+            </CardTitle>
+            <CardDescription>Latest plant health analysis</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {dashboardData.recentScans?.scans?.length > 0 ? (
+              <div className="space-y-3">
+                {dashboardData.recentScans.scans.slice(0, 4).map((scan: any, index: number) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-green-100 rounded-full">
+                        <Leaf className="h-4 w-4 text-green-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{scan.crop_type} - {scan.prediction}</p>
+                        <p className="text-sm text-gray-600">
+                          {new Date(scan.scan_date).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                    <Badge 
+                      variant={scan.confidence > 80 ? "default" : "secondary"}
+                      className={scan.confidence > 80 ? "bg-green-100 text-green-800" : ""}
+                    >
+                      {scan.confidence}% confidence
+                    </Badge>
+                  </div>
+                ))}
+                <Link href="/dashboard/history">
+                  <Button variant="outline" className="w-full">
+                    View All Scans
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <Scan className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500 mb-4">No scans yet</p>
+                <Link href="/dashboard/scanner">
+                  <Button>Start Your First Scan</Button>
+                </Link>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Market Prices & Government Schemes */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Market Prices */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5" />
+              Market Prices
+            </CardTitle>
+            <CardDescription>Today's commodity prices</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {dashboardData.marketPrices?.length > 0 ? (
+              <div className="space-y-3">
+                {dashboardData.marketPrices.slice(0, 3).map((price: any, index: number) => (
+                  <div key={index} className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">{price.commodity}</p>
+                      <p className="text-sm text-gray-600">{price.market}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold">₹{price.price}/{price.unit}</p>
+                      <p className="text-sm text-green-600">+2.5%</p>
+                    </div>
+                  </div>
+                ))}
+                <Button variant="outline" className="w-full">
+                  View All Prices
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </div>
+            ) : (
+              <p className="text-gray-500">Market data loading...</p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Government Schemes */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              Government Schemes
+            </CardTitle>
+            <CardDescription>Available support programs</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="p-3 bg-blue-50 rounded-lg">
+              <h4 className="font-medium text-blue-900">PMFBY Crop Insurance</h4>
+              <p className="text-sm text-blue-700">Protect your crops with government insurance</p>
+              <Button variant="outline" size="sm" className="mt-2">
+                Apply Now
               </Button>
             </div>
-
-            {/* Select Your Crop Card */}
-            <Card className="shadow-sm">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Leaf className="h-5 w-5 text-green-600" />
-                  <CardTitle>Select Your Crop</CardTitle>
-                </div>
-                <CardDescription>
-                  Choose from our supported crops for accurate disease detection
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="relative mb-4">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    placeholder="Search crops..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                  {filteredCrops.map((crop) => (
-                    <button
-                      key={crop.name}
-                      onClick={() => handleCropSelection(crop)}
-                      className={`group p-4 rounded-lg border transition-all duration-200 text-center ${
-                        crop.isAval
-                          ? "hover:border-green-500 hover:bg-green-50/50 border-gray-200"
-                          : "border-gray-300 bg-gray-100 opacity-60 cursor-not-allowed"
-                      }`}
-                      disabled={!crop.isAval}
-                    >
-                      <div className="text-4xl mb-2">{crop.image}</div>
-                      <h3
-                        className={`font-medium ${
-                          crop.isAval ? "text-gray-800" : "text-gray-500"
-                        }`}
-                      >
-                        {crop.name}
-                      </h3>
-                      <p
-                        className={`text-xs ${
-                          crop.isAval ? "text-gray-500" : "text-gray-400"
-                        }`}
-                      >
-                        {crop.isAval ? "Active" : "Deactivated"}
-                      </p>
-                    </button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* === RIGHT COLUMN === */}
-          <div className="space-y-6">
-            {/* Weather Card */}
-            <Card className="shadow-sm">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Thermometer className="h-5 w-5 text-blue-500" />
-                  <CardTitle className="text-lg">Weather</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="flex flex-col items-center">
-                <div className="flex items-center gap-4">
-                  <Sun className="h-16 w-16 text-yellow-500" />
-                  <div>
-                    <div className="text-5xl font-bold text-gray-900">
-                      {mockWeather.temperature}°C
-                    </div>
-                    <p className="text-gray-600 text-center">
-                      {mockWeather.condition}
-                    </p>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-500 mt-3">
-                  {mockWeather.location}
-                </p>
-                <div className="mt-2 text-blue-600 font-semibold flex items-center gap-1">
-                  <Droplets className="h-4 w-4" />
-                  <span>{mockWeather.humidity}%</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Quick Stats Card */}
-            <Card className="shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-lg">Quick Stats</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4 text-sm">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Total Scans</span>
-                    <span className="font-bold text-blue-600 text-base">
-                      127
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Healthy Plants</span>
-                    <span className="font-bold text-green-600 text-base">
-                      89%
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Diseases Detected</span>
-                    <span className="font-bold text-blue-600 text-base">
-                      14
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">This Month</span>
-                    <span className="font-bold text-blue-600 text-base">
-                      23
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Scanning Tips Card */}
-            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Lightbulb className="h-5 w-5 text-yellow-600" />
-                <h3 className="font-semibold text-yellow-800">Scanning Tips</h3>
-              </div>
-              <ul className="space-y-2 text-sm text-yellow-700 list-disc list-inside">
-                <li>Use good lighting for better results</li>
-                <li>Focus on one leaf at a time</li>
-                <li>Avoid shadows and blurred images</li>
-              </ul>
+            <div className="p-3 bg-green-50 rounded-lg">
+              <h4 className="font-medium text-green-900">Soil Health Card</h4>
+              <p className="text-sm text-green-700">Get soil analysis and recommendations</p>
+              <Button variant="outline" size="sm" className="mt-2">
+                Check Status
+              </Button>
             </div>
+            <Button variant="outline" className="w-full">
+              View All Schemes
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Quick Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick Actions</CardTitle>
+          <CardDescription>Common tasks for better farm management</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Link href="/dashboard/scanner">
+              <Button variant="outline" className="h-20 flex flex-col">
+                <Scan className="h-6 w-6 mb-2" />
+                Disease Scan
+              </Button>
+            </Link>
+            <Link href="/dashboard/weather">
+              <Button variant="outline" className="h-20 flex flex-col">
+                <CloudRain className="h-6 w-6 mb-2" />
+                Weather Forecast
+              </Button>
+            </Link>
+            <Link href="/dashboard/market">
+              <Button variant="outline" className="h-20 flex flex-col">
+                <TrendingUp className="h-6 w-6 mb-2" />
+                Market Prices
+              </Button>
+            </Link>
+            <Link href="/dashboard/reports">
+              <Button variant="outline" className="h-20 flex flex-col">
+                <FileText className="h-6 w-6 mb-2" />
+                Generate Report
+              </Button>
+            </Link>
           </div>
-        </div>
-      </main>
+        </CardContent>
+      </Card>
     </div>
   );
-}
+};
+
+export default Dashboard;

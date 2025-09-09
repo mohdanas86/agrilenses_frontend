@@ -9,9 +9,24 @@ export interface CropModel {
 }
 
 export interface ScanResult {
+  id: string;
   disease: string | null;
   confidence: number;
-  isHealthy: boolean;
+  severity?: string;
+  isHealthy?: boolean;
+  recommendations?: string[];
+  analysis?: {
+    timestamp: string;
+    imageUrl: string;
+    cropType: string;
+    location: string;
+    weather?: any;
+    environmentalFactors?: {
+      temperature: number;
+      humidity: number;
+      conditions: string;
+    };
+  };
 }
 
 export interface AnalysisData {
@@ -21,5 +36,5 @@ export interface AnalysisData {
   confidence: number;
   isHealthy: boolean;
   timestamp: string;
-  suggestion?: []
+  suggestion?: string[];
 }

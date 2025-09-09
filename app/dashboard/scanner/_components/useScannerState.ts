@@ -1,18 +1,20 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { CropModel, ScanResult, AnalysisData } from "./types";
-import { cropModels } from "./crop-models";
 import { useGlobalContext } from "@/context/GlobalContext";
-import axios from 'axios'
+import { useUser } from "@clerk/nextjs";
+import apiService from "@/lib/api-service";
 
 export function useScannerState() {
   const router = useRouter();
-  const { selectedCrop, setSelectedCrop, userId } = useGlobalContext();
+  const { user } = useUser();
+  const { selectedCrop, setSelectedCrop } = useGlobalContext();
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [scanResult, setScanResult] = useState<ScanResult | null>(null);
 
   const handleImageSelect = useCallback((image: string) => {
     setCapturedImage(image);
@@ -22,6 +24,7 @@ export function useScannerState() {
   const handleRetakePhoto = useCallback(() => {
     setCapturedImage(null);
     setError(null);
+    setScanResult(null);
   }, []);
 
   const handleCropSelect = useCallback((crop: CropModel) => {
@@ -40,142 +43,141 @@ export function useScannerState() {
     router.push("/dashboard/results");
   }, [router]);
 
-  // ======================================
-  
-  // console.log("Current selected crop:", selectedCrop.name.toLowerCase());  
-  // console.log("Captured image:", capturedImage);
-  // console.log("userId:", userId);
-
-
-  // ========================================================
-  //=== call model according to selected crop ===
- const handleAnalyzeCrop = async () => {
-  setAnalyzing(true);
-  setError(null);
-
-  // validate user ID
-  if (userId === undefined || userId === null) {
-    throw new Error("User ID is not defined.");
-  }
-
-  try {
-    let url = "";
-
-    // Check if a crop is selected
-    if (!selectedCrop || !selectedCrop.id) {
-      throw new Error("No crop selected for analysis.");
+  // Enhanced analyze function using API service
+  const analyzeImage = useCallback(async () => {
+    if (!capturedImage || !user?.id) {
+      setError("Please capture an image and ensure you're logged in");
+      return;
     }
 
-    // Check if an image is captured
-    if (!capturedImage) {
-      throw new Error("No image captured for analysis.");
-    }
+    setAnalyzing(true);
+    setError(null);
 
-    // Call the appropriate model based on the selected crop
-    if (selectedCrop.name.toLowerCase() === "tomato") {
-      url = `${process.env.TOMATO_PREDICTION_API_URL || process.env.NEXT_PUBLIC_TOMATO_PREDICTION_API_URL}`;
-    }
-    if (selectedCrop.name.toLowerCase() === "potato") {
-      url = `${process.env.POTATO_PREDICTION_API_URL || process.env.NEXT_PUBLIC_POTATO_PREDICTION_API_URL}`;
-    }
-
-    // Convert base64 to File object
-    const base64Response = await fetch(capturedImage);
-    const blob = await base64Response.blob();
-    const file = new File([blob], "image.jpg", { type: "image/jpeg" });
-
-    // Prepare the image as FormData
-    const formData = new FormData();
-    formData.append("file", file);
-
-    // predict disease using the selected crop model
-    const predictionResponse = await axios.post(url, formData);
-    // 🚫 Removed manual headers
-
-    // console.log("Prediction response:", predictionResponse.data); // confidence, crop, prediction
-
-    // Upload image to Cloudinary via API route
-    const uploadFormData = new FormData();
-    uploadFormData.append("image", file);
-    uploadFormData.append("folder", `plant-disease/${selectedCrop.name}`);
-
-    const imageResponse = await axios.post("/api/upload-image", uploadFormData);
-
-    // Handle image upload response
-    if (imageResponse.status !== 200) {
-      throw new Error("Failed to upload image");
-    }
-
-    // generate the suggestion (with error handling)
- 
-      const suggestion = await axios.post("/api/generate-suggestion", {
-        plantName: selectedCrop.name,
-        disease: predictionResponse.data.prediction || null,
-        confidence: predictionResponse.data.confidence || 0,
-      });
-
-    // console.log("Suggestion response:", suggestion.data.suggestion);
-
-    // store data in database (with error handling)
-    let storedSuccessfully = false;
     try {
-      const analysisData = await axios.post("/api/store-scan", {
-        plantName: selectedCrop.name,
-        disease: predictionResponse.data.prediction || null,
-        confidence: predictionResponse.data.confidence || 0,
-        imageUrl: imageResponse.data.secure_url,
-        suggestion: suggestion.data.suggestion || null,
+      // Convert base64 image to file with proper validation
+      console.log('Converting captured image to file...');
+      
+      let blob: Blob;
+      let fileName: string;
+      
+      if (capturedImage.startsWith('data:')) {
+        // Handle data URL format
+        const response = await fetch(capturedImage);
+        blob = await response.blob();
+        fileName = `scan-${Date.now()}.jpg`;
+      } else {
+        // Handle regular URL format
+        const response = await fetch(capturedImage);
+        blob = await response.blob();
+        fileName = `scan-${Date.now()}.jpg`;
+      }
+
+      // Ensure the blob is a valid image
+      if (!blob.type.startsWith('image/')) {
+        throw new Error('Invalid image format');
+      }
+
+      const file = new File([blob], fileName, { 
+        type: blob.type || 'image/jpeg',
+        lastModified: Date.now()
       });
-      // console.log("Analysis data stored:", analysisData.data);
-      storedSuccessfully = true;
-    } catch (dbError) {
-      console.error("Database storage error:", dbError);
-      // Continue without storing in DB - still show results to user
+
+      console.log('File created:', {
+        name: file.name,
+        size: file.size,
+        type: file.type
+      });
+
+      // Get user location (you might want to implement geolocation)
+      const userLocation = 'Delhi'; // Default location
+
+      // Perform complete scan workflow using API service
+      const result = await apiService.performScan(
+        selectedCrop.id as 'potato' | 'tomato',
+        file,
+        user.id,
+        userLocation
+      );
+
+      // Format the result for the UI
+      const scanResult: ScanResult = {
+        id: result.scanRecord.id || `scan-${Date.now()}`,
+        disease: result.prediction.prediction,
+        confidence: result.prediction.confidence,
+        severity: result.prediction.severity || 'Medium',
+        recommendations: result.prediction.recommendations || [],
+        analysis: {
+          timestamp: new Date().toISOString(),
+          imageUrl: capturedImage,
+          cropType: selectedCrop.name,
+          location: userLocation,
+          weather: result.weather,
+          environmentalFactors: {
+            temperature: result.weather?.temperature || 0,
+            humidity: result.weather?.humidity || 0,
+            conditions: result.weather?.conditions || 'Unknown'
+          }
+        }
+      };
+
+      setScanResult(scanResult);
+      
+      // Store in session storage for results page
+      sessionStorage.setItem('latestScanResult', JSON.stringify(scanResult));
+      
+      // Navigate to results
+      router.push('/dashboard/results');
+
+    } catch (err) {
+      console.error('Analysis failed:', err);
+      setError(err instanceof Error ? err.message : 'Analysis failed. Please try again.');
+    } finally {
+      setAnalyzing(false);
     }
+  }, [capturedImage, user?.id, selectedCrop, router]);
 
-    // Prepare the analysis result data
-    const resultData: AnalysisData = {
-      crop: selectedCrop.name,
-      image: imageResponse.data.secure_url,
-      disease: predictionResponse.data.prediction || null,
-      confidence: predictionResponse.data.confidence || 0,
-      isHealthy: predictionResponse.data.prediction === "healthy" ? true : false || false,
-      suggestion: suggestion.data.suggestion || "",
-      timestamp: new Date().toISOString(),
-    };
+  // Submit feedback for a scan
+  const submitFeedback = useCallback(async (scanId: string, rating: number, comments?: string) => {
+    if (!user?.id) return;
 
-    // Save the analysis result in local storage
-    localStorage.setItem("scanResult", JSON.stringify(resultData));
+    try {
+      await apiService.submitFeedback({
+        scan_id: scanId,
+        prediction_id: scanId,
+        user_id: user.id,
+        feedback_type: 'rating',
+        rating,
+        comments
+      });
+    } catch (err) {
+      console.error('Failed to submit feedback:', err);
+    }
+  }, [user?.id]);
 
-    // Navigate to results page with the analysis result
-    router.push("/dashboard/results");
-
-  } catch (err) {
-    setError("Analysis failed. Please try again.");
-    console.error("Error predicting disease:", err);
-    return null;
-  } finally {
-    setAnalyzing(false);
-  }
-};
-
-  // ======================================
-
+  // Legacy support for old component structure
+  const handleAnalyzeCrop = analyzeImage;
 
   return {
     // State
+    selectedCrop,
     capturedImage,
     analyzing,
     error,
-    selectedCrop,
-    // Handlers
+    scanResult,
+    
+    // Actions
     handleImageSelect,
     handleRetakePhoto,
     handleCropSelect,
-    handleAnalyzeCrop,
     handleBack,
     handleViewHistory,
     handleViewResults,
-
+    analyzeImage,
+    handleAnalyzeCrop, // Legacy support
+    submitFeedback,
+    
+    // Utils
+    userId: user?.id || null,
+    isLoggedIn: !!user?.id
   };
 }
