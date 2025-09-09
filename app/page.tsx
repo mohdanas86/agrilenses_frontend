@@ -43,7 +43,6 @@ const HomePage = () => {
       {/* Hero Section */}
       <Hero />
       <Models />
-
       <Footer />
     </div>
   );

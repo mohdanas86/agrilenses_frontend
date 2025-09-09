@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ScanRecord, FilterStatus, SortBy, HistoryStats } from './types';
 
 export function useHistoryState() {
@@ -10,10 +10,15 @@ export function useHistoryState() {
   const [isClient, setIsClient] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const hasFetched = useRef(false); // Prevent multiple API calls
 
   useEffect(() => {
     setIsClient(true);
-    fetchScanHistory();
+    // Only fetch if we haven't fetched before
+    if (!hasFetched.current) {
+      fetchScanHistory();
+      hasFetched.current = true;
+    }
   }, []);
 
   const fetchScanHistory = async () => {
@@ -28,7 +33,7 @@ export function useHistoryState() {
         throw new Error(data.error || 'Failed to fetch scan history');
       }
 
-      if (data.success && data.scanHistory) {
+      if (data.success && data.scanHistory && data.scanHistory.length > 0) {
         // Transform the data to match the frontend interface
         const transformedHistory: ScanRecord[] = data.scanHistory.map((scan: any) => ({
           id: scan.id,
@@ -44,15 +49,53 @@ export function useHistoryState() {
 
         setScanHistory(transformedHistory);
       } else {
-        setScanHistory([]);
+        // Use placeholder data for demo/prototype
+        setScanHistory(generatePlaceholderData());
       }
     } catch (error) {
       console.error('Error fetching scan history:', error);
       setError(error instanceof Error ? error.message : 'Failed to load scan history');
-      setScanHistory([]);
+      // Use placeholder data as fallback
+      setScanHistory(generatePlaceholderData());
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Generate placeholder data for prototype/demo
+  const generatePlaceholderData = (): ScanRecord[] => {
+    const crops = ['Tomato', 'Potato'];
+    const diseases = ['Late Blight', 'Early Blight', 'Bacterial Spot', null]; // null means healthy
+    const placeholderData: ScanRecord[] = [];
+
+    // Generate data for the last 30 days
+    for (let i = 0; i < 30; i++) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      
+      // Generate 2-3 scans per day
+      const scansPerDay = Math.floor(Math.random() * 2) + 2;
+      
+      for (let j = 0; j < scansPerDay; j++) {
+        const crop = crops[Math.floor(Math.random() * crops.length)];
+        const diseaseRandom = diseases[Math.floor(Math.random() * diseases.length)];
+        const isHealthy = diseaseRandom === null;
+        
+        placeholderData.push({
+          id: `placeholder-${i}-${j}`,
+          crop,
+          disease: diseaseRandom,
+          confidence: Math.random() * 0.3 + 0.7, // 70-100% confidence
+          timestamp: new Date(date.getTime() + j * 3600000), // Spread throughout the day
+          image: `/placeholder-${crop.toLowerCase()}.jpg`,
+          isHealthy,
+          location: 'Chennai, TN',
+          suggestion: isHealthy ? 'Plant looks healthy!' : `Treatment needed for ${diseaseRandom}`
+        });
+      }
+    }
+
+    return placeholderData.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
   };
 
   const filteredAndSortedHistory = scanHistory

@@ -31,6 +31,10 @@ export default function HistoryPage() {
 
   const stats = getStats();
 
+  if (stats != null) {
+    console.log("Fetching scan history...", stats);
+  }
+
   // Loading state
   if (isLoading) {
     return (

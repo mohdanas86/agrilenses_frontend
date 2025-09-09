@@ -42,6 +42,11 @@ import {
   FileText,
   History,
   Leaf,
+  MessageCircle,
+  BookOpen,
+  Building2,
+  TrendingUp,
+  CloudSun,
 } from "lucide-react";
 
 import { GiTomato } from "react-icons/gi";
@@ -78,6 +83,11 @@ const data: {
           isActive: true,
         },
         {
+          title: "AI Chat",
+          url: "/dashboard/chat",
+          icon: MessageCircle,
+        },
+        {
           title: "Scanner",
           url: "/dashboard/scanner",
           icon: Camera,
@@ -91,6 +101,26 @@ const data: {
           title: "History",
           url: "/dashboard/history",
           icon: History,
+        },
+        {
+          title: "Chat History",
+          url: "/dashboard/chat/history",
+          icon: BookOpen,
+        },
+        {
+          title: "Gov Schemes",
+          url: "/dashboard/schemes",
+          icon: Building2,
+        },
+        {
+          title: "Market Prices",
+          url: "/dashboard/market",
+          icon: TrendingUp,
+        },
+        {
+          title: "Weather",
+          url: "/dashboard/weather",
+          icon: CloudSun,
         },
       ],
     },
@@ -165,7 +195,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </div>
         <div className="bg-green-50 rounded-lg p-3 border border-green-200">
           <p className="text-sm text-green-800 font-medium">
-            Smart Crop Health Monitor
+            Smart Crop Advisor
           </p>
           <p className="text-xs text-green-600 mt-1">
             AI-powered disease detection
