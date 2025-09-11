@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useClerk, useUser } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 type MainNavItem = {
   title: string;
@@ -49,7 +49,6 @@ import {
   CloudSun,
 } from "lucide-react";
 
-import { GiTomato } from "react-icons/gi";
 import {
   Sidebar,
   SidebarContent,
@@ -169,6 +168,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { signOut } = useClerk();
   const { isSignedIn } = useUser();
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleLogout = async () => {
     try {
@@ -179,9 +179,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     }
   };
 
+  // Helper function to check if a nav item is active
+  const isActiveNavItem = (url: string) => {
+    if (url === "/dashboard") {
+      return pathname === "/dashboard";
+    }
+    return pathname.startsWith(url);
+  };
+
   return (
     <Sidebar {...props}>
-      <SidebarHeader className="p-6 border-b border-gray-200">
+      <SidebarHeader className="p-6 border-b border-gray-200 relative">
         <div className="flex items-center gap-3 mb-3">
           <div className="flex items-center justify-center w-10 h-10 bg-green-600 rounded-lg">
             <Leaf className="h-6 w-6 text-white" />
@@ -212,7 +220,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 {item.title === "Crop Models"
                   ? item.items.map((navItem) => (
                       <SidebarMenuItem key={navItem.title}>
-                        <SidebarMenuButton asChild>
+                        <SidebarMenuButton
+                          asChild
+                          isActive={isActiveNavItem(navItem.url)}
+                        >
                           <a
                             href={navItem.url}
                             className="flex items-center gap-2"
@@ -230,7 +241,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     ))
                   : item.items.map((navItem) => (
                       <SidebarMenuItem key={navItem.title}>
-                        <SidebarMenuButton asChild>
+                        <SidebarMenuButton
+                          asChild
+                          isActive={isActiveNavItem(navItem.url)}
+                        >
                           <a
                             href={navItem.url}
                             className="flex items-center gap-2"

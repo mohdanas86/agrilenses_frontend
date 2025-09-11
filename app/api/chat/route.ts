@@ -1,153 +1,288 @@
 import { NextRequest, NextResponse } from "next/server";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { TextToSpeechClient } from "@google-cloud/text-to-speech";
+
+// Initialize Google services
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+
+// Initialize Google Cloud TTS
+let ttsClient: TextToSpeechClient | null = null;
+try {
+  if (process.env.GOOGLE_CLOUD_SERVICE_ACCOUNT_KEY) {
+    const credentials = JSON.parse(process.env.GOOGLE_CLOUD_SERVICE_ACCOUNT_KEY);
+    ttsClient = new TextToSpeechClient({
+      credentials,
+      projectId: credentials.project_id,
+    });
+  }
+} catch (error) {
+  console.error("Failed to initialize TTS client:", error);
+}
 
 // Types
 interface ChatRequest {
-  message: string;
+  transcript: string;
   language: string;
-  userId: string;
+  userId?: string;
+  location?: {
+    latitude: number;
+    longitude: number;
+    city: string;
+    state: string;
+    country: string;
+  };
 }
 
-interface TranslationRequest {
-  text: string;
-  source: string;
-  target: string;
+interface ChatResponse {
+  transcript: string;
+  language: string;
+  replyText: string;
+  audioBase64: string | null;
+  warnings: string[];
 }
 
-// Mock AI responses for different languages
-const MOCK_AI_RESPONSES: { [key: string]: { [key: string]: string } } = {
+interface Tool {
+  name: string;
+  triggerFn: (text: string) => boolean;
+  handlerFn: (text: string, language: string, location?: any) => Promise<string>;
+}
+
+// Language configurations
+const LANGUAGE_CONFIG = {
   en: {
-    "tomato": "For tomato diseases, use copper-based fungicides, ensure proper spacing for air circulation, and practice crop rotation. Remove infected plant parts immediately.",
-    "rice": "Rice cultivation requires well-drained paddy fields, timely transplanting, and proper water management. Use high-yielding varieties suitable for your region.",
-    "pest": "For organic pest control, use neem oil, introduce beneficial insects, set up pheromone traps, and maintain field hygiene.",
-    "soil": "Soil health can be improved through organic matter addition, proper pH management, regular testing, and avoiding over-fertilization.",
-    "weather": "Monitor weather forecasts regularly. Adjust irrigation schedules based on rainfall predictions and protect crops during extreme weather.",
-    "default": "I understand your farming question. For specific agricultural advice, I recommend consulting with local agricultural extension officers. Here are some general farming best practices: maintain soil health, practice crop rotation, monitor for pests and diseases regularly, and use integrated farming approaches."
+    name: "English",
+    speechCode: "en-US",
+    ttsVoice: "en-US-Standard-D", // Standard English voice
   },
   hi: {
-    "tomato": "टमाटर के रोगों के लिए तांबा आधारित कवकनाशी का उपयोग करें, हवा के संचार के लिए उचित दूरी बनाए रखें, और फसल चक्र का अभ्यास करें। संक्रमित पौधे के हिस्सों को तुरंत हटा दें।",
-    "rice": "धान की खेती के लिए अच्छी जल निकासी वाली धान की खेत, समय पर रोपाई, और उचित जल प्रबंधन की आवश्यकता होती है। अपने क्षेत्र के लिए उपयुक्त उच्च उत्पादन वाली किस्मों का उपयोग करें।",
-    "pest": "जैविक कीट नियंत्रण के लिए नीम का तेल उपयोग करें, लाभकारी कीड़े पेश करें, फेरोमोन जाल लगाएं, और खेत की स्वच्छता बनाए रखें।",
-    "soil": "मिट्टी के स्वास्थ्य में सुधार जैविक पदार्थ जोड़ने, उचित pH प्रबंधन, नियमित परीक्षण, और अधिक उर्वरक से बचने से हो सकता है।",
-    "weather": "मौसम पूर्वानुमान की नियमित निगरानी करें। बारिश की भविष्यवाणी के आधार पर सिंचाई कार्यक्रम समायोजित करें और चरम मौसम के दौरान फसलों की सुरक्षा करें।",
-    "default": "मैं आपके किसानी के सवाल को समझता हूं। विशिष्ट कृषि सलाह के लिए, मैं स्थानीय कृषि विस्तार अधिकारियों से सलाह लेने की सिफारिश करता हूं।"
+    name: "Hindi", 
+    speechCode: "hi-IN",
+    ttsVoice: "hi-IN-Standard-A", // Standard Hindi voice
   },
   ta: {
-    "tomato": "தக்காளி நோய்களுக்கு செம்பு அடிப்படையிலான பூஞ்சைக் கொல்லிகளைப் பயன்படுத்துங்கள், காற்று சுழற்சிக்கு சரியான இடைவெளியை உறுதி செய்யுங்கள், மற்றும் பயிர் சுழற்சியை கடைபிடியுங்கள்.",
-    "rice": "அரிசி விவசாயத்திற்கு நல்ல வடிகால் கொண்ட நெல் வயல்கள், சரியான நேரத்தில் நடுதல், மற்றும் சரியான நீர் மேலாண்மை தேவை।",
-    "pest": "இயற்கை பூச்சி கட்டுப்பாட்டுக்கு வேப்ப எண்ணெய் பயன்படுத்துங்கள், பயனுள்ள பூச்சிகளை அறிமுகப்படுத்துங்கள், ஃபெரோமோன் பொறிகளை அமைத்து, வயல் சுத்தத்தை பராமரியுங்கள்.",
-    "soil": "மண் ஆரோக்யத்தை கரிம பொருள் சேர்ப்பது, சரியான pH மேலாண்மை, வழக்கமான சோதனை, மற்றும் அதிக உரத்தை தவிர்ப்பதன் மூலம் மேம்படுத்தலாம்.",
-    "weather": "வானிலை முன்னறிவிப்புகளை தொடர்ந்து கண்காணியுங்கள். மழை கணிப்புகளின் அடிப்படையில் நீர்ப்பாசன அட்டவணைகளை சரிசெய்து, கடுமையான வானிலையின் போது பயிர்களை பாதுகாத்துங்கள்.",
-    "default": "உங்கள் விவசாய கேள்வியை நான் புரிந்துகொள்கிறேன். குறிப்பிட்ட விவசாய ஆலோசனைக்கு, உள்ளூர் விவசாய விரிவாக்க அதிகாரிகளுடன் ஆலோசிக்க பரிந்துரைக்கிறேன்."
+    name: "Tamil",
+    speechCode: "ta-IN", 
+    ttsVoice: "ta-IN-Standard-A", // Standard Tamil voice
   }
 };
 
-// Generate AI response based on input
-function generateAIResponse(message: string, language: string): string {
-  const lowerMessage = message.toLowerCase();
-  const responses = MOCK_AI_RESPONSES[language] || MOCK_AI_RESPONSES.en;
-  
-  // Find the best matching response
-  for (const [key, response] of Object.entries(responses)) {
-    if (key !== "default" && lowerMessage.includes(key)) {
-      return response;
+// Weather tool with location support
+const weatherTool: Tool = {
+  name: "weather",
+  triggerFn: (text: string) => {
+    const weatherKeywords = {
+      en: ["weather", "temperature", "rain", "climate", "forecast", "irrigation", "field work"],
+      hi: ["मौसम", "तापमान", "बारिश", "जलवायु", "पूर्वानुमान", "सिंचाई", "खेत"],
+      ta: ["வானிலை", "வெப்பநிலை", "மழை", "காலநிலை", "முன்னறிவிப்பு", "நீர்ப்பாசனம்"]
+    };
+    
+    const allKeywords = Object.values(weatherKeywords).flat();
+    return allKeywords.some(keyword => text.toLowerCase().includes(keyword.toLowerCase()));
+  },
+  handlerFn: async (text: string, language: string, location?: any) => {
+    try {
+      // Build weather API URL with location if available
+      let weatherUrl = 'http://localhost:3000/api/weather';
+      if (location?.latitude && location?.longitude) {
+        weatherUrl += `?lat=${location.latitude}&lng=${location.longitude}`;
+      } else if (location?.city) {
+        weatherUrl += `?city=${encodeURIComponent(location.city)}`;
+      }
+
+      const response = await fetch(weatherUrl);
+      const data = await response.json();
+      
+      if (data.error) {
+        return "Sorry, I couldn't fetch weather information right now.";
+      }
+
+      const weatherInfo = `Current weather in ${data.location.name}, ${data.location.region}:
+🌡️ Temperature: ${data.current.temperature}°C (feels like ${data.current.feelsLike}°C)
+☁️ Condition: ${data.current.condition}
+💧 Humidity: ${data.current.humidity}%
+💨 Wind: ${data.current.windSpeed} km/h ${data.current.windDirection}
+🔆 UV Index: ${data.current.uvIndex}
+
+🚜 Farming Advice:
+• Irrigation: ${data.farming.irrigation}
+• Field Work: ${data.farming.fieldWork}
+• Pest Risk: ${data.farming.pestRisk}
+• General: ${data.farming.generalAdvice}`;
+
+      return weatherInfo;
+    } catch (error) {
+      console.error("Weather API error:", error);
+      return "Sorry, I couldn't fetch weather information right now.";
+    }
+  }
+};
+
+// News tool
+const newsTool: Tool = {
+  name: "news",
+  triggerFn: (text: string) => {
+    const newsKeywords = {
+      en: ["news", "latest", "headlines", "agriculture news", "farming news"],
+      hi: ["समाचार", "ताजा", "शीर्षक", "कृषि समाचार", "खेती समाचार"],
+      ta: ["செய்திகள்", "சமீபத்திய", "தலைப்புகள்", "விவசாய செய்திகள்"]
+    };
+    
+    const allKeywords = Object.values(newsKeywords).flat();
+    return allKeywords.some(keyword => text.toLowerCase().includes(keyword.toLowerCase()));
+  },
+  handlerFn: async (text: string, language: string, location?: any) => {
+    try {
+      // For demo, return mock agriculture news
+      const mockNews = {
+        en: "Latest Agriculture News: Government announces new subsidy scheme for organic farming. Monsoon forecast shows good rainfall expected this season.",
+        hi: "नवीनतम कृषि समाचार: सरकार ने जैविक खेती के लिए नई सब्सिडी योजना की घोषणा की। मानसून पूर्वानुमान इस मौसम में अच्छी बारिश की उम्मीद दिखाता है।",
+        ta: "சமீபத்திய விவசாய செய்திகள்: இயற்கை விவசாயத்துக்கு அரசு புதிய மானியத் திட்டத்தை அறிவித்துள்ளது. இந்த பருவத்தில் நல்ல மழை எதிர்பார்க்கப்படுகிறது."
+      };
+      
+      return mockNews[language as keyof typeof mockNews] || mockNews.en;
+    } catch (error) {
+      console.error("News API error:", error);
+      return "Sorry, I couldn't fetch news right now.";
+    }
+  }
+};
+
+// Tool registry - easy to extend
+const TOOLS: Tool[] = [weatherTool, newsTool];
+
+// Intent detection and tool routing
+async function detectIntentAndRoute(text: string, language: string, location?: any): Promise<string> {
+  // Check if any tool should handle this request
+  for (const tool of TOOLS) {
+    if (tool.triggerFn(text)) {
+      const toolResult = await tool.handlerFn(text, language, location);
+      return `${toolResult}\n\n`; // Add context for Gemini
     }
   }
   
-  return responses.default;
+  return ""; // No tool matched, return empty context
 }
 
-// Mock translation function (replace with LibreTranslate API)
-async function translateText(text: string, source: string, target: string): Promise<string> {
-  // For demo purposes, return same text or simple translations
-  if (source === target) return text;
-  
-  const simpleTranslations: { [key: string]: { [key: string]: string } } = {
-    "How to treat tomato blight?": {
-      hi: "टमाटर के झुलसा रोग का इलाज कैसे करें?",
-      ta: "தக்காளி ப்ளைட் நோயை எப்படி குணப்படுத்துவது?"
-    },
-    "What is the best time to plant rice?": {
-      hi: "धान लगाने का सबसे अच्छा समय कब है?",
-      ta: "அரிசி நடுவதற்கு சிறந்த நேரம் எது?"
+// Generate AI response using Gemini
+async function generateGeminiResponse(userInput: string, language: string, toolContext: string): Promise<string> {
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    
+    const languageNames = {
+      en: "English",
+      hi: "Hindi", 
+      ta: "Tamil"
+    };
+    
+    const prompt = `You are a helpful farming assistant. Respond in ${languageNames[language as keyof typeof languageNames] || "English"} language only.
+    
+    User question: ${userInput}
+    
+    ${toolContext ? `Additional context: ${toolContext}` : ""}
+    
+    Provide a helpful, concise response for farmers. Keep it practical and actionable. Maximum 100 words.`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text();
+  } catch (error) {
+    console.error("Gemini API error:", error);
+    
+    // Fallback responses
+    const fallbackResponses = {
+      en: "I understand your farming question. For specific advice, please consult local agricultural experts.",
+      hi: "मैं आपके किसानी के सवाल को समझता हूं। विशिष्ट सलाह के लिए, कृपया स्थानीय कृषि विशेषज्ञों से संपर्क करें।",
+      ta: "உங்கள் விவசாய கேள்வியை நான் புரிந்துகொள்கிறேன். குறிப்பிட்ட ஆலோசனைக்கு, உள்ளூர் விவசாய நிபுணர்களை தொடர்பு கொள்ளுங்கள்."
+    };
+    
+    return fallbackResponses[language as keyof typeof fallbackResponses] || fallbackResponses.en;
+  }
+}
+
+// Text-to-Speech conversion
+async function convertTextToSpeech(text: string, language: string): Promise<string | null> {
+  if (!ttsClient) {
+    console.error("TTS client not initialized");
+    return null;
+  }
+
+  try {
+    const languageConfig = LANGUAGE_CONFIG[language as keyof typeof LANGUAGE_CONFIG];
+    if (!languageConfig) {
+      console.error("Unsupported language:", language);
+      return null;
     }
-  };
-  
-  return simpleTranslations[text]?.[target] || text;
+
+    const request = {
+      input: { text },
+      voice: {
+        languageCode: languageConfig.speechCode,
+        name: languageConfig.ttsVoice,
+      },
+      audioConfig: {
+        audioEncoding: "MP3" as const,
+        speakingRate: 1.0,
+        pitch: 0.0,
+      },
+    };
+
+    const [response] = await ttsClient.synthesizeSpeech(request);
+    
+    if (response.audioContent) {
+      return Buffer.from(response.audioContent).toString('base64');
+    }
+    
+    return null;
+  } catch (error) {
+    console.error("TTS conversion error:", error);
+    return null;
+  }
 }
 
-// Chat endpoint
+// Main chat endpoint
 export async function POST(request: NextRequest) {
   try {
-    const { message, language, userId }: ChatRequest = await request.json();
+    const { transcript, language, userId, location }: ChatRequest = await request.json();
+    const warnings: string[] = [];
     
-    if (!message || !language || !userId) {
+    if (!transcript || !language) {
       return NextResponse.json(
-        { error: "Missing required fields: message, language, userId" },
+        { error: "Missing required fields: transcript, language" },
         { status: 400 }
       );
     }
 
-    // Generate AI response
-    const aiResponse = generateAIResponse(message, language);
+    // 1. Detect intent and route to appropriate tool (with location support)
+    const toolContext = await detectIntentAndRoute(transcript, language, location);
     
-    // For production, save to database
-    const chatData = {
-      id: `chat-${Date.now()}`,
-      userId,
-      userMessage: {
-        text: message,
-        language,
-        timestamp: new Date().toISOString(),
-      },
-      aiResponse: {
-        text: aiResponse,
-        language,
-        timestamp: new Date().toISOString(),
-      },
+    // 2. Generate AI response with Gemini (including tool context if available)
+    const replyText = await generateGeminiResponse(transcript, language, toolContext);
+    
+    // 3. Convert response to speech
+    let audioBase64: string | null = null;
+    try {
+      audioBase64 = await convertTextToSpeech(replyText, language);
+      if (!audioBase64) {
+        warnings.push("Voice synthesis failed");
+      }
+    } catch (error) {
+      console.error("TTS error:", error);
+      warnings.push("Voice synthesis error");
+    }
+
+    const response: ChatResponse = {
+      transcript,
+      language,
+      replyText,
+      audioBase64,
+      warnings,
     };
 
-    console.log("Chat data:", chatData);
-
-    return NextResponse.json({
-      success: true,
-      response: aiResponse,
-      chatId: chatData.id,
-    });
-
+    return NextResponse.json(response);
   } catch (error) {
     console.error("Chat API error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
-    );
-  }
-}
-
-// Translation endpoint
-export async function PUT(request: NextRequest) {
-  try {
-    const { text, source, target }: TranslationRequest = await request.json();
-    
-    if (!text || !source || !target) {
-      return NextResponse.json(
-        { error: "Missing required fields: text, source, target" },
-        { status: 400 }
-      );
-    }
-
-    const translatedText = await translateText(text, source, target);
-    
-    return NextResponse.json({
-      success: true,
-      translatedText,
-      source,
-      target,
-    });
-
-  } catch (error) {
-    console.error("Translation API error:", error);
-    return NextResponse.json(
-      { error: "Translation failed" },
       { status: 500 }
     );
   }

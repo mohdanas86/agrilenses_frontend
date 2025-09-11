@@ -8,6 +8,8 @@ import Hero from "./_components/Hero";
 import Footer from "./_components/Footer";
 import Models from "./_components/Models";
 
+import "@11labs/convai-widget-core";
+
 const HomePage = () => {
   const { isSignedIn, isLoaded } = useUser();
   const router = useRouter();
@@ -39,7 +41,6 @@ const HomePage = () => {
   return (
     <div className="min-h-screen">
       <Header />
-
       {/* Hero Section */}
       <Hero />
       <Models />

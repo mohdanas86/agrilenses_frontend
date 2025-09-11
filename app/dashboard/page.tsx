@@ -245,63 +245,7 @@ export default function AgriLensDashboard() {
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 sm:gap-6">
           {/* === LEFT COLUMN === */}
           <div className="xl:col-span-3 space-y-4 sm:space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {/* Priority 1: Scan Your Crop Card - Most Important */}
-              <div className="bg-green-600 rounded-xl p-6 text-white shadow-lg border-2 border-green-400">
-                <div className="flex items-start gap-4">
-                  <div className="bg-green-500 p-3 rounded-full shadow-lg">
-                    <Camera className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-semibold">
-                      Start Disease Detection
-                    </h2>
-                    <p className="text-green-100 mt-1 font-medium">
-                      Take a photo of your crop leaf for instant AI-powered
-                      disease detection and get treatment recommendations
-                      immediately
-                    </p>
-                  </div>
-                </div>
-                <Link href={"/dashboard/scanner"} className="currsor-pointer">
-                  <Button
-                    size="lg"
-                    className="w-full bg-white text-green-700 hover:bg-green-50 font-bold text-lg mt-4 py-6 flex justify-between items-center cursor-pointer shadow-md"
-                    // onClick={() => router.push("/dashboard/scanner")}
-                  >
-                    Start Scanning Now
-                    <ChevronRight className="h-6 w-6" />
-                  </Button>
-                </Link>
-              </div>
-
-              {/* NEW: AI Chat Assistant Card */}
-              <div className="bg-blue-600 rounded-xl p-6 text-white shadow-lg border-2 border-blue-400">
-                <div className="flex items-start gap-4">
-                  <div className="bg-blue-500 p-3 rounded-full shadow-lg">
-                    <MessageCircle className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-semibold">AI Farm Advisor</h2>
-                    <p className="text-blue-100 mt-1 font-medium">
-                      Get instant expert farming advice in English, Hindi, or
-                      Tamil with voice support
-                    </p>
-                  </div>
-                </div>
-                <Link href={"/dashboard/chat"} className="cursor-pointer">
-                  <Button
-                    size="lg"
-                    className="w-full bg-white text-blue-700 hover:bg-blue-50 font-bold text-lg mt-4 py-6 flex justify-between items-center cursor-pointer shadow-md"
-                  >
-                    Start Chatting
-                    <ChevronRight className="h-6 w-6" />
-                  </Button>
-                </Link>
-              </div>
-            </div>
-
-            {/* Priority 2: Quick Stats Overview - Key Metrics */}
+            {/* Priority 1: Quick Stats Overview - Key Metrics */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               <Card className="shadow-md border-l-4 border-l-blue-500 bg-blue-50/30">
                 <CardContent className="p-3 sm:p-4">
@@ -360,145 +304,7 @@ export default function AgriLensDashboard() {
               </Card>
             </div>
 
-            {/* Priority 3: Select Your Crop Card - Essential for Scanning */}
-            <Card className="shadow-md border border-green-200">
-              <CardHeader className="bg-green-50/50">
-                <div className="flex items-center gap-2">
-                  <Leaf className="h-5 w-5 text-green-600" />
-                  <CardTitle className="text-green-800">
-                    Select Your Crop
-                  </CardTitle>
-                </div>
-                <CardDescription className="text-green-700">
-                  Choose from our supported crops for accurate disease detection
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-4">
-                <div className="relative mb-4">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    placeholder="Search crops..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 border-green-200 focus:border-green-400"
-                  />
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-                  {filteredCrops.map((crop) => (
-                    <button
-                      key={crop.name}
-                      onClick={() => handleCropSelection(crop)}
-                      className={`cursor-pointer group p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 text-center ${
-                        crop.isAval
-                          ? "hover:border-green-500 hover:bg-green-50 border-green-200 hover:shadow-md"
-                          : "border-gray-300 bg-gray-100 opacity-60 cursor-not-allowed"
-                      }`}
-                      disabled={!crop.isAval}
-                    >
-                      <div className="flex flex-col items-center mb-2">
-                        <div className="text-3xl sm:text-4xl mb-2">
-                          {crop.emoji}
-                        </div>
-                      </div>
-                      <h3
-                        className={`font-semibold text-sm sm:text-base ${
-                          crop.isAval ? "text-gray-800" : "text-gray-500"
-                        }`}
-                      >
-                        {crop.name}
-                      </h3>
-                      <p
-                        className={`text-xs font-medium ${
-                          crop.isAval ? "text-green-600" : "text-gray-400"
-                        }`}
-                      >
-                        {crop.isAval ? "Active" : "Coming Soon..."}
-                      </p>
-                    </button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Priority 4: Recent Activity - What's Happening Now */}
-            <Card className="shadow-md border border-indigo-200">
-              <CardHeader className="bg-indigo-50/50">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <div className="h-3 w-3 bg-indigo-500 rounded-full animate-pulse"></div>
-                  Recent Scan Activity
-                </CardTitle>
-                <CardDescription className="text-indigo-700">
-                  Latest plant health scans and results
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {historyLoading ? (
-                  <div className="flex items-center justify-center h-32">
-                    <div className="text-gray-500">
-                      Loading recent activity...
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-3 max-h-64 overflow-y-auto">
-                    {scanHistory.slice(0, 5).map((scan, index) => (
-                      <div
-                        key={scan.id}
-                        className="flex items-center gap-4 p-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200 hover:shadow-sm transition-shadow"
-                      >
-                        <div
-                          className={`w-4 h-4 rounded-full ${
-                            scan.isHealthy ? "bg-green-500" : "bg-red-500"
-                          } shadow-sm`}
-                        ></div>
-                        <div className="flex-1">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <p className="font-semibold text-gray-900">
-                                {scan.crop}
-                              </p>
-                              <p
-                                className={`text-sm font-medium ${
-                                  scan.isHealthy
-                                    ? "text-green-600"
-                                    : "text-red-600"
-                                }`}
-                              >
-                                {scan.isHealthy
-                                  ? "Healthy"
-                                  : `${scan.disease || "Disease detected"}`}
-                              </p>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-sm font-bold text-gray-900">
-                                {Math.round(scan.confidence * 100)}%
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                {scan.timestamp.toLocaleDateString()}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                    {scanHistory.length === 0 && (
-                      <div className="text-center py-8 text-gray-500">
-                        <div className="w-12 h-12 mx-auto mb-3 bg-gray-100 rounded-full flex items-center justify-center">
-                          <Search className="h-6 w-6 text-gray-400" />
-                        </div>
-                        <div className="font-medium">
-                          No recent scans available
-                        </div>
-                        <div className="text-sm">
-                          Start scanning to see activity here!
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Priority 5: Analytics & Charts Section - Detailed Analysis */}
+            {/* Priority 2: Analytics & Charts Section - Detailed Analysis */}
             <div className="space-y-4 sm:space-y-6">
               {/* Analytics Header */}
               <div className="flex items-center gap-2 border-l-4 border-l-green-500 pl-3">
@@ -891,37 +697,203 @@ export default function AgriLensDashboard() {
                 </Card>
               </div>
             </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Priority 1: Scan Your Crop Card - Most Important */}
+              <div className="bg-green-600 rounded-xl p-6 text-white shadow-lg border-2 border-green-400">
+                <div className="flex items-start gap-4">
+                  <div className="bg-green-500 p-3 rounded-full shadow-lg">
+                    <Camera className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-semibold">
+                      Start Disease Detection
+                    </h2>
+                    <p className="text-green-100 mt-1 font-medium">
+                      Take a photo of your crop leaf for instant AI-powered
+                      disease detection and get treatment recommendations
+                      immediately
+                    </p>
+                  </div>
+                </div>
+                <Link href={"/dashboard/scanner"} className="currsor-pointer">
+                  <Button
+                    size="lg"
+                    className="w-full bg-white text-green-700 hover:bg-green-50 font-bold text-lg mt-4 py-6 flex justify-between items-center cursor-pointer shadow-md"
+                    // onClick={() => router.push("/dashboard/scanner")}
+                  >
+                    Start Scanning Now
+                    <ChevronRight className="h-6 w-6" />
+                  </Button>
+                </Link>
+              </div>
+
+              {/* NEW: AI Chat Assistant Card */}
+              <div className="bg-blue-600 rounded-xl p-6 text-white shadow-lg border-2 border-blue-400">
+                <div className="flex items-start gap-4">
+                  <div className="bg-blue-500 p-3 rounded-full shadow-lg">
+                    <MessageCircle className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-semibold">AI Farm Advisor</h2>
+                    <p className="text-blue-100 mt-1 font-medium">
+                      Get instant expert farming advice in English, Hindi, or
+                      Tamil with voice support
+                    </p>
+                  </div>
+                </div>
+                <Link href={"/dashboard/chat"} className="cursor-pointer">
+                  <Button
+                    size="lg"
+                    className="w-full bg-white text-blue-700 hover:bg-blue-50 font-bold text-lg mt-4 py-6 flex justify-between items-center cursor-pointer shadow-md"
+                  >
+                    Start Chatting
+                    <ChevronRight className="h-6 w-6" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            {/* Priority 3: Select Your Crop Card - Essential for Scanning */}
+            <Card className="shadow-md border border-green-200">
+              <CardHeader className="bg-green-50/50">
+                <div className="flex items-center gap-2">
+                  <Leaf className="h-5 w-5 text-green-600" />
+                  <CardTitle className="text-green-800">
+                    Select Your Crop
+                  </CardTitle>
+                </div>
+                <CardDescription className="text-green-700">
+                  Choose from our supported crops for accurate disease detection
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <div className="relative mb-4">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    placeholder="Search crops..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 border-green-200 focus:border-green-400"
+                  />
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                  {filteredCrops.map((crop) => (
+                    <button
+                      key={crop.name}
+                      onClick={() => handleCropSelection(crop)}
+                      className={`cursor-pointer group p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 text-center ${
+                        crop.isAval
+                          ? "hover:border-green-500 hover:bg-green-50 border-green-200 hover:shadow-md"
+                          : "border-gray-300 bg-gray-100 opacity-60 cursor-not-allowed"
+                      }`}
+                      disabled={!crop.isAval}
+                    >
+                      <div className="flex flex-col items-center mb-2">
+                        <div className="text-3xl sm:text-4xl mb-2">
+                          {crop.emoji}
+                        </div>
+                      </div>
+                      <h3
+                        className={`font-semibold text-sm sm:text-base ${
+                          crop.isAval ? "text-gray-800" : "text-gray-500"
+                        }`}
+                      >
+                        {crop.name}
+                      </h3>
+                      <p
+                        className={`text-xs font-medium ${
+                          crop.isAval ? "text-green-600" : "text-gray-400"
+                        }`}
+                      >
+                        {crop.isAval ? "Active" : "Coming Soon..."}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Priority 4: Recent Activity - What's Happening Now */}
+            <Card className="shadow-md border border-indigo-200">
+              <CardHeader className="bg-indigo-50/50">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <div className="h-3 w-3 bg-indigo-500 rounded-full animate-pulse"></div>
+                  Recent Scan Activity
+                </CardTitle>
+                <CardDescription className="text-indigo-700">
+                  Latest plant health scans and results
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {historyLoading ? (
+                  <div className="flex items-center justify-center h-32">
+                    <div className="text-gray-500">
+                      Loading recent activity...
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3 max-h-64 overflow-y-auto">
+                    {scanHistory.slice(0, 5).map((scan, index) => (
+                      <div
+                        key={scan.id}
+                        className="flex items-center gap-4 p-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200 hover:shadow-sm transition-shadow"
+                      >
+                        <div
+                          className={`w-4 h-4 rounded-full ${
+                            scan.isHealthy ? "bg-green-500" : "bg-red-500"
+                          } shadow-sm`}
+                        ></div>
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="font-semibold text-gray-900">
+                                {scan.crop}
+                              </p>
+                              <p
+                                className={`text-sm font-medium ${
+                                  scan.isHealthy
+                                    ? "text-green-600"
+                                    : "text-red-600"
+                                }`}
+                              >
+                                {scan.isHealthy
+                                  ? "Healthy"
+                                  : `${scan.disease || "Disease detected"}`}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-bold text-gray-900">
+                                {Math.round(scan.confidence * 100)}%
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {scan.timestamp.toLocaleDateString()}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {scanHistory.length === 0 && (
+                      <div className="text-center py-8 text-gray-500">
+                        <div className="w-12 h-12 mx-auto mb-3 bg-gray-100 rounded-full flex items-center justify-center">
+                          <Search className="h-6 w-6 text-gray-400" />
+                        </div>
+                        <div className="font-medium">
+                          No recent scans available
+                        </div>
+                        <div className="text-sm">
+                          Start scanning to see activity here!
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
           {/* === RIGHT COLUMN === */}
           <div className="xl:col-span-1 space-y-4 sm:space-y-6">
-            {/* Priority 1: Scanning Tips Card - Most Important for New Users */}
-            <div className="bg-gradient-to-br from-yellow-50 to-amber-50 border border-yellow-300 rounded-xl p-3 sm:p-4 shadow-md">
-              <div className="flex items-center gap-2 mb-3">
-                <Lightbulb className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
-                <h3 className="font-bold text-amber-800 text-sm sm:text-base">
-                  Pro Tips
-                </h3>
-              </div>
-              <ul className="space-y-2 text-xs sm:text-sm text-amber-700 list-none">
-                <li className="flex items-center gap-2">
-                  <span className="w-2 h-2 bg-amber-500 rounded-full"></span>
-                  Use good lighting for better scanning results
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-2 h-2 bg-amber-500 rounded-full"></span>
-                  Ask AI for farming advice in your language
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-2 h-2 bg-amber-500 rounded-full"></span>
-                  Use voice input for hands-free interaction
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-2 h-2 bg-amber-500 rounded-full"></span>
-                  Keep 15-20cm distance from leaf when scanning
-                </li>
-              </ul>
-            </div>
-
             {/* Priority 2: Enhanced Weather Card - Environmental Context */}
             <Card className="shadow-lg border border-blue-200">
               <CardHeader className="pb-2 bg-blue-50/50">

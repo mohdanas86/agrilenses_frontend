@@ -43,6 +43,17 @@ export default function RootLayout({
         <ClerkProvider>
           <GlobalProvider>{children}</GlobalProvider>
         </ClerkProvider>
+
+        {/* =================================================================================== 
+        Calling ElevenLabs Convai Widget Script Here Caused Hydration Issues.
+        =================================================================================== */}
+
+        {/* <elevenlabs-convai agent-id="agent_6501k4we87cwee6s5b9qwp4rsnkm"></elevenlabs-convai>
+        <script
+          src="https://unpkg.com/@elevenlabs/convai-widget-embed"
+          async
+          type="text/javascript"
+        ></script> */}
       </body>
     </html>
   );

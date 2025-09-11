@@ -153,7 +153,13 @@ export function VoiceRecorder({
 // Extend the Window interface for TypeScript
 declare global {
   interface Window {
-    SpeechRecognition: any;
-    webkitSpeechRecognition: any;
+    SpeechRecognition: {
+      new (): SpeechRecognition;
+      prototype: SpeechRecognition;
+    };
+    webkitSpeechRecognition: {
+      new (): SpeechRecognition;
+      prototype: SpeechRecognition;
+    };
   }
 }

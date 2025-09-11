@@ -62,9 +62,9 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
       let url = `http://api.weatherapi.com/v1/current.json?key=${process.env.NEXT_PUBLIC_WEATHER_API_KEY}&q=${city}&aqi=no`;
 
       // response
-      const response = await axios.get(url);
-      setWeatherData(response.data);
-      console.log("Fetch Weather : ", response.data);
+      // const response = await axios.get(url);
+      // setWeatherData(response.data);
+      // console.log("Fetch Weather : ", response.data);
     } catch (err) {
       console.log("error", err);
     }

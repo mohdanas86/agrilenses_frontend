@@ -9,7 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@11labs/convai-widget-core": "^0.0.5",
     "@clerk/nextjs": "^6.25.4",
+    "@elevenlabs/react": "^0.6.2",
+    "@google-cloud/text-to-speech": "^6.3.0",
     "@google/generative-ai": "^0.24.1",
     "@prisma/client": "^6.12.0",
     "@radix-ui/react-dialog": "^1.1.14",
