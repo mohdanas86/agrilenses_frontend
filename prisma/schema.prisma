@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  clerkId      String   @unique // Clerk user ID
+  name         String
+  email        String   @unique
+  phone        String?
+  address      Address?
+  profileImage String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Scan {
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
+  clerkUserId  String      // Store Clerk user ID directly
+  plantName    String
+  disease      String
+  confidence   Float
+  imageUrl     String
+  suggestion   Suggestion?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+type Suggestion {
+  identification    Identification
+  managementPlan    ManagementPlan
+  longTermCare      LongTermCare
+  warning           String
+}
+
+type Identification {
+  diseaseName String
+  plant       String
+  confidence  Int
+  symptoms    String[]
+}
+
+type ManagementPlan {
+  culturalAndPreventative String[]
+  treatments              Treatments
+}
+
+type Treatments {
+  organicOptions  TreatmentOption[]
+  chemicalOptions TreatmentOption[]
+}
+
+type TreatmentOption {
+  activeIngredient String
+  description      String
+  application      String
+}
+
+type LongTermCare {
+  notes String[]
+}
+
+type Address {
+  street   String?
+  city     String?
+  state    String?
+  country  String?
+  pincode  String?
+}
