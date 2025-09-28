@@ -1295,7 +1295,7 @@ export default function WeatherPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                   <div className="text-center">
                     <div className="text-4xl font-bold text-blue-600 mb-2">
                       {selectedLocation.current.temperature}°C
@@ -1418,8 +1418,8 @@ export default function WeatherPage() {
             ) : forecastData ? (
               <Card className="shadow-lg">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Calendar className="h-6 w-6 text-blue-600" />
+                  <CardTitle className="flex items-center gap-2 lg:text-lg text-md">
+                    <Calendar className="lg:h-6 lg:w-6 w-4 h-4 text-blue-600" />
                     5-Day Weather Forecast - {forecastData.location.name}
                   </CardTitle>
                   <CardDescription>
@@ -1439,11 +1439,11 @@ export default function WeatherPage() {
                         return (
                           <div
                             key={date}
-                            className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg border border-blue-100"
+                            className="flex lg:flex-row flex-col items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg border border-blue-100"
                           >
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-4 w-full lg:w-auto">
                               <div className="text-3xl">{summary.icon}</div>
-                              <div>
+                              <div className="flex-1">
                                 <p className="font-semibold text-lg">
                                   {summary.day}
                                 </p>
@@ -1456,68 +1456,72 @@ export default function WeatherPage() {
                               </div>
                             </div>
 
-                            <div className="flex items-center gap-6 text-center">
-                              <div>
-                                <p className="text-xl font-bold text-blue-600">
-                                  {summary.high}°/{summary.low}°
-                                </p>
-                                <p className="text-xs text-gray-600">
-                                  High/Low
-                                </p>
-                              </div>
+                            <div className="flex flex-col lg:flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-4 mt-4 lg:mt-0 w-full lg:w-auto">
+                              <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 flex-1">
+                                <div className="text-center sm:text-left">
+                                  <p className="text-xl font-bold text-blue-600">
+                                    {summary.high}°/{summary.low}°
+                                  </p>
+                                  <p className="text-xs text-gray-600">
+                                    High/Low
+                                  </p>
+                                </div>
 
-                              <div>
-                                <p className="text-sm font-semibold">
-                                  {summary.maxPrecipitation}%
-                                </p>
-                                <p className="text-xs text-gray-600">
-                                  Rain Chance
-                                </p>
-                              </div>
+                                <div className="text-center sm:text-left">
+                                  <p className="text-sm font-semibold">
+                                    {summary.maxPrecipitation}%
+                                  </p>
+                                  <p className="text-xs text-gray-600">
+                                    Rain Chance
+                                  </p>
+                                </div>
 
-                              <div>
-                                <p className="text-sm font-semibold">
-                                  {summary.maxWindSpeed} km/h
-                                </p>
-                                <p className="text-xs text-gray-600">Wind</p>
-                              </div>
+                                <div className="text-center sm:text-left">
+                                  <p className="text-sm font-semibold">
+                                    {summary.maxWindSpeed} km/h
+                                  </p>
+                                  <p className="text-xs text-gray-600">Wind</p>
+                                </div>
 
-                              <div>
-                                <p className="text-sm font-semibold">
-                                  {summary.avgHumidity}%
-                                </p>
-                                <p className="text-xs text-gray-600">
-                                  Humidity
-                                </p>
+                                <div className="text-center sm:text-left">
+                                  <p className="text-sm font-semibold">
+                                    {summary.avgHumidity}%
+                                  </p>
+                                  <p className="text-xs text-gray-600">
+                                    Humidity
+                                  </p>
+                                </div>
                               </div>
 
                               {/* Farming Insights */}
-                              <div className="text-right">
-                                <div className="flex items-center gap-1 mb-1">
-                                  <Leaf className="h-4 w-4 text-green-600" />
-                                  <span className="text-xs font-medium">
-                                    Farming
-                                  </span>
-                                </div>
-                                <Badge
-                                  className={`text-xs ${
-                                    summary.maxPrecipitation > 70
-                                      ? "bg-blue-100 text-blue-800"
+                              <div className="flex justify-center lg:justify-end mt-2 lg:mt-0">
+                                <div className="text-center lg:text-right">
+                                  <div className="flex items-center justify-center lg:justify-end gap-1 mb-1">
+                                    <Leaf className="h-4 w-4 text-green-600" />
+                                    <span className="text-xs font-medium">
+                                      Farming
+                                    </span>
+                                  </div>
+                                  <Badge
+                                    className={`text-xs ${
+                                      summary.maxPrecipitation > 70
+                                        ? "bg-blue-100 text-blue-800"
+                                        : summary.avgHumidity > 80
+                                        ? "bg-yellow-100 text-yellow-800"
+                                        : summary.high > 35
+                                        ? "bg-red-100 text-red-800"
+                                        : "bg-green-100 text-green-800"
+                                    }`}
+                                  >
+                                    {summary.maxPrecipitation > 70
+                                      ? "Rain Expected"
                                       : summary.avgHumidity > 80
-                                      ? "bg-yellow-100 text-yellow-800"
+                                      ? "High Humidity"
                                       : summary.high > 35
-                                      ? "bg-red-100 text-red-800"
-                                      : "bg-green-100 text-green-800"
-                                  }`}
-                                >
-                                  {summary.maxPrecipitation > 70
-                                    ? "Rain Expected"
-                                    : summary.avgHumidity > 80
-                                    ? "High Humidity"
-                                    : summary.high > 35
-                                    ? "Hot Day"
-                                    : "Good Conditions"}
-                                </Badge>
+                                      ? "Hot Day"
+                                      : "Good Conditions"}
+                                  </Badge>
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -1531,7 +1535,7 @@ export default function WeatherPage() {
                       <Leaf className="h-5 w-5" />
                       Agricultural Insights
                     </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
                       <div>
                         <p className="font-medium text-green-700">
                           Temperature Trend
@@ -1650,7 +1654,7 @@ export default function WeatherPage() {
                 </CardHeader>
                 <CardContent>
                   {/* Temperature Chart */}
-                  <div className="h-64 sm:h-80 mb-6">
+                  <div className="h-48 sm:h-64 lg:h-80 mb-6">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={forecastData.forecast.slice(0, 24)}>
                         {" "}
@@ -1699,11 +1703,11 @@ export default function WeatherPage() {
                   </div>
 
                   {/* Hourly Details Grid */}
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                     {forecastData.forecast.slice(0, 24).map((hour, index) => (
                       <div
                         key={index}
-                        className="text-center p-3 bg-gradient-to-br from-blue-50 to-white rounded-lg border border-blue-100"
+                        className="text-center p-4 bg-gradient-to-br from-blue-50 to-white rounded-lg border border-blue-100"
                       >
                         <p className="text-sm font-semibold mb-2">
                           {hour.time}
@@ -1732,7 +1736,7 @@ export default function WeatherPage() {
                       <Sun className="h-5 w-5" />
                       Hourly Farming Recommendations
                     </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                       <div>
                         <p className="font-medium text-amber-700">
                           Best Irrigation Times
@@ -1820,8 +1824,8 @@ export default function WeatherPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                  <div className="bg-blue-50 p-4 rounded-lg">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                  <div className="bg-blue-50 p-4 sm:p-6 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
                       <Droplets className="h-5 w-5 text-blue-600" />
                       <span className="font-semibold">Soil Moisture</span>
@@ -1834,7 +1838,7 @@ export default function WeatherPage() {
                     </p>
                   </div>
 
-                  <div className="bg-green-50 p-4 rounded-lg">
+                  <div className="bg-green-50 p-4 sm:p-6 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
                       <TrendingUp className="h-5 w-5 text-green-600" />
                       <span className="font-semibold">Evapotranspiration</span>
@@ -1845,7 +1849,7 @@ export default function WeatherPage() {
                     <p className="text-sm text-gray-600">Daily water loss</p>
                   </div>
 
-                  <div className="bg-orange-50 p-4 rounded-lg">
+                  <div className="bg-orange-50 p-4 sm:p-6 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
                       <Thermometer className="h-5 w-5 text-orange-600" />
                       <span className="font-semibold">Growing Degree Days</span>
@@ -1858,7 +1862,7 @@ export default function WeatherPage() {
                     </p>
                   </div>
 
-                  <div className="bg-purple-50 p-4 rounded-lg">
+                  <div className="bg-purple-50 p-4 sm:p-6 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
                       <CheckCircle className="h-5 w-5 text-purple-600" />
                       <span className="font-semibold">Field Work</span>
@@ -1891,7 +1895,7 @@ export default function WeatherPage() {
                 <CardDescription>Pest and disease risk levels</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <span className="font-semibold">Pest Risk</span>
