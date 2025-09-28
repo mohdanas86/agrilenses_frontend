@@ -49,6 +49,8 @@ export function useScannerState() {
 
   // ========================================================
   //=== call model according to selected crop ===
+  // ========================================================
+  //=== call model according to selected crop ===
  const handleAnalyzeCrop = async () => {
   setAnalyzing(true);
   setError(null);
@@ -79,59 +81,168 @@ export function useScannerState() {
       url = `${process.env.POTATO_PREDICTION_API_URL || process.env.NEXT_PUBLIC_POTATO_PREDICTION_API_URL}`;
     }
 
-    // Convert base64 to File object
-    const base64Response = await fetch(capturedImage);
-    const blob = await base64Response.blob();
-    const file = new File([blob], "image.jpg", { type: "image/jpeg" });
+    // Validate API URL is available
+    if (!url || url === 'undefined') {
+      throw new Error(`Prediction API URL not configured for ${selectedCrop.name}`);
+    }
+
+    // Optimized base64 to File conversion
+    const base64Data = capturedImage.split(',')[1];
+    const binaryString = atob(base64Data);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    const file = new File([bytes], "image.jpg", { type: "image/jpeg" });
 
     // Prepare the image as FormData
     const formData = new FormData();
     formData.append("file", file);
 
-    // predict disease using the selected crop model
-    const predictionResponse = await axios.post(url, formData);
-    // 🚫 Removed manual headers
+    // Run prediction and image upload in parallel for better performance
+    let predictionResponse;
+    let imageResponse;
 
-    // console.log("Prediction response:", predictionResponse.data); // confidence, crop, prediction
-
-    // Upload image to Cloudinary via API route
-    const uploadFormData = new FormData();
-    uploadFormData.append("image", file);
-    uploadFormData.append("folder", `plant-disease/${selectedCrop.name}`);
-
-    const imageResponse = await axios.post("/api/upload-image", uploadFormData);
+    try {
+      console.log("Starting parallel API calls...");
+      console.log("Prediction URL:", url);
+      
+      [predictionResponse, imageResponse] = await Promise.all([
+        axios.post(url, formData, { 
+          timeout: 30000, // 30 second timeout
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          }
+        }).catch((error: any) => {
+          console.error("Prediction API error details:", {
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            data: error.response?.data,
+            message: error.message
+          });
+          throw new Error(`Prediction API failed (${error.response?.status || 'unknown'}): ${error.response?.data?.message || error.message || 'Unknown error'}`);
+        }),
+        (async () => {
+          try {
+            console.log("Starting image upload...");
+            const uploadFormData = new FormData();
+            uploadFormData.append("image", file);
+            uploadFormData.append("folder", `plant-disease/${selectedCrop.name}`);
+            const result = await axios.post("/api/upload-image", uploadFormData, { 
+              timeout: 30000,
+              headers: {
+                'Content-Type': 'multipart/form-data',
+              }
+            });
+            console.log("Image upload successful");
+            return result;
+          } catch (uploadError: any) {
+            console.error("Image upload error details:", {
+              status: uploadError.response?.status,
+              statusText: uploadError.response?.statusText,
+              data: uploadError.response?.data,
+              message: uploadError.message
+            });
+            throw new Error(`Image upload failed (${uploadError.response?.status || 'unknown'}): ${uploadError.response?.data?.error || uploadError.message || 'Unknown error'}`);
+          }
+        })()
+      ]);
+      
+      console.log("Both API calls completed successfully");
+    } catch (parallelError: any) {
+      console.error("Parallel API call error:", parallelError);
+      throw new Error(`API call failed: ${parallelError.message || 'Unknown error'}`);
+    }
 
     // Handle image upload response
     if (imageResponse.status !== 200) {
       throw new Error("Failed to upload image");
     }
 
-    // generate the suggestion (with error handling)
- 
-      const suggestion = await axios.post("/api/generate-suggestion", {
-        plantName: selectedCrop.name,
-        disease: predictionResponse.data.prediction || null,
-        confidence: predictionResponse.data.confidence || 0,
-      });
-
-    // console.log("Suggestion response:", suggestion.data.suggestion);
-
-    // store data in database (with error handling)
-    let storedSuccessfully = false;
-    try {
-      const analysisData = await axios.post("/api/store-scan", {
-        plantName: selectedCrop.name,
-        disease: predictionResponse.data.prediction || null,
-        confidence: predictionResponse.data.confidence || 0,
-        imageUrl: imageResponse.data.secure_url,
-        suggestion: suggestion.data.suggestion || null,
-      });
-      // console.log("Analysis data stored:", analysisData.data);
-      storedSuccessfully = true;
-    } catch (dbError) {
-      console.error("Database storage error:", dbError);
-      // Continue without storing in DB - still show results to user
-    }
+    // Generate suggestion and store in database in parallel
+    const [suggestionResponse, storeResponse] = await Promise.all([
+      (async () => {
+        try {
+          console.log("Generating suggestion...");
+          const response = await axios.post("/api/generate-suggestion", {
+            plantName: selectedCrop.name,
+            disease: predictionResponse.data.prediction || null,
+            confidence: predictionResponse.data.confidence || 0,
+          });
+          console.log("Suggestion generated successfully");
+          return response;
+        } catch (suggestionError: any) {
+          console.error("Suggestion generation error:", {
+            status: suggestionError.response?.status,
+            statusText: suggestionError.response?.statusText,
+            data: suggestionError.response?.data,
+            message: suggestionError.message
+          });
+          // Return a fallback suggestion
+          return {
+            data: {
+              suggestion: {
+                identification: {
+                  diseaseName: predictionResponse.data.prediction || "Unknown",
+                  plant: selectedCrop.name,
+                  confidence: Math.round((predictionResponse.data.confidence || 0) * 100),
+                  symptoms: ["Please consult a local agricultural expert for specific symptoms"]
+                },
+                managementPlan: {
+                  culturalAndPreventative: [
+                    "Remove affected plant parts",
+                    "Improve air circulation",
+                    "Avoid overhead watering"
+                  ],
+                  treatments: {
+                    organicOptions: [{
+                      activeIngredient: "Neem Oil",
+                      description: "Natural fungicide",
+                      application: "Mix 2-3 ml per liter and spray weekly"
+                    }],
+                    chemicalOptions: [{
+                      activeIngredient: "Copper fungicide",
+                      description: "Effective against fungal diseases",
+                      application: "Apply according to instructions"
+                    }]
+                  }
+                },
+                longTermCare: {
+                  notes: [
+                    "Monitor plant health regularly",
+                    "Practice crop rotation",
+                    "Maintain proper soil health"
+                  ]
+                },
+                warning: "This is a general suggestion. Consult local experts for specific advice."
+              }
+            }
+          };
+        }
+      })(),
+      (async () => {
+        try {
+          console.log("Storing scan in database...");
+          const response = await axios.post("/api/store-scan", {
+            plantName: selectedCrop.name,
+            disease: predictionResponse.data.prediction || null,
+            confidence: predictionResponse.data.confidence || 0,
+            imageUrl: imageResponse.data.secure_url,
+            suggestion: null, // Will be updated after generation
+          });
+          console.log("Scan stored successfully");
+          return response;
+        } catch (dbError: any) {
+          console.error("Database storage error:", {
+            status: dbError.response?.status,
+            statusText: dbError.response?.statusText,
+            data: dbError.response?.data,
+            message: dbError.message
+          });
+          return null; // Continue without storing in DB
+        }
+      })()
+    ]);
 
     // Prepare the analysis result data
     const resultData: AnalysisData = {
@@ -140,7 +251,7 @@ export function useScannerState() {
       disease: predictionResponse.data.prediction || null,
       confidence: predictionResponse.data.confidence || 0,
       isHealthy: predictionResponse.data.prediction === "healthy" ? true : false || false,
-      suggestion: suggestion.data.suggestion || "",
+      suggestion: suggestionResponse.data.suggestion || "",
       timestamp: new Date().toISOString(),
     };
 

@@ -5,7 +5,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export async function GET() {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
     
     const prompt = "Hello, respond with just 'API working' if you can read this.";
     const result = await model.generateContent(prompt);
@@ -13,7 +13,7 @@ export async function GET() {
     
     return NextResponse.json({ 
       success: true, 
-      model: "gemini-1.5-flash",
+      model: "gemini-flash-latest",
       response: response.text() 
     });
   } catch (error) {
