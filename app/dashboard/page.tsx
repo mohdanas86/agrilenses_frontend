@@ -696,7 +696,9 @@ export default function AgriLensDashboard() {
                       <div className="h-2 w-2 bg-red-500 rounded-full"></div>
                       Disease Detection Trends
                     </CardTitle>
-                    <CardDescription>Weekly disease detection for tomato and potato crops</CardDescription>
+                    <CardDescription>
+                      Weekly disease detection for tomato and potato crops
+                    </CardDescription>
                   </CardHeader>
 
                   <CardContent className="pt-4 flex-1">
@@ -894,7 +896,9 @@ export default function AgriLensDashboard() {
                       <div className="h-2 w-2 bg-green-500 rounded-full"></div>
                       Plant Health Overview
                     </CardTitle>
-                    <CardDescription>Current healthy vs diseased plant counts</CardDescription>
+                    <CardDescription>
+                      Current healthy vs diseased plant counts
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="flex-1">
                     {historyLoading ? (
