@@ -24,7 +24,6 @@ import {
   X,
   ChevronDown,
   Camera,
-  History,
   BarChart3,
   Shield,
   LogIn,
@@ -45,7 +44,6 @@ const Header = () => {
 
   const dashboardNavigation = [
     { name: "Scanner", href: "/dashboard/scanner", icon: Camera },
-    { name: "History", href: "/dashboard/history", icon: History },
     { name: "Results", href: "/dashboard/results", icon: BarChart3 },
     { name: "Dashboard", href: "/dashboard", icon: Shield },
   ];

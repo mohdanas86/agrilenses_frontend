@@ -47,7 +47,7 @@ export default function ElevenLabsConvai() {
     try {
       setLoading(true);
       await conversation.startSession({
-        agentId: "agent_6501k4we87cwee6s5b9qwp4rsnkm", // 👈 replace with your agent ID
+        agentId: "agent_0301k4yrgnwxek69zvgb9evfn2tp", // 👈 replace with your agent ID
         connectionType: "webrtc",
       });
     } catch (err) {
@@ -57,12 +57,12 @@ export default function ElevenLabsConvai() {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto rounded-3xl shadow-xl border bg-white/90 backdrop-blur-sm">
-      <div className="text-base font-semibold flex items-center gap-2 text-emerald-700 p-4 pb-0">
-        <Sparkles className="w-5 h-5 text-emerald-600" /> Need Help? Talk to Us
-      </div>
+    <Card className="w-full max-w-md mx-auto bg-transparent border-0 shadow-none">
+      {/* <div className="text-base font-semibold flex items-center gap-2 text-emerald-700 p-4 pb-0">
+        <Sparkles className="w-5 h-5 text-emerald-600" /> Talk to Advisor
+      </div> */}
 
-      <CardContent className="p-3 px-5 text-center space-y-5">
+      <CardContent className="p-0 text-center space-y-5">
         {!hasMicAccess && (
           <div className="flex flex-col items-center gap-3 text-gray-600">
             <MicOff className="w-8 h-8 text-red-500" />
@@ -76,14 +76,14 @@ export default function ElevenLabsConvai() {
           <Button
             onClick={startConversation}
             disabled={loading}
-            className="w-full rounded-xl text-base font-medium"
+            className="w-full rounded-md py-3 text-base font-medium"
           >
             {loading ? (
               <Loader2 className="animate-spin w-5 h-5 mr-2" />
             ) : (
               <Phone className="w-5 h-5 mr-2" />
             )}
-            {loading ? "Connecting..." : "Start Conversation"}
+            {loading ? "Connecting..." : "Talk to Advisor"}
           </Button>
         )}
 

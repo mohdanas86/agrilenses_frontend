@@ -40,7 +40,6 @@ import {
   Home,
   Camera,
   FileText,
-  History,
   Leaf,
   MessageCircle,
   BookOpen,
@@ -95,16 +94,6 @@ const data: {
           title: "Results",
           url: "/dashboard/results",
           icon: FileText,
-        },
-        {
-          title: "History",
-          url: "/dashboard/history",
-          icon: History,
-        },
-        {
-          title: "Chat History",
-          url: "/dashboard/chat/history",
-          icon: BookOpen,
         },
         {
           title: "Gov Schemes",
@@ -203,10 +192,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </div>
         <div className="bg-green-50 rounded-lg p-3 border border-green-200">
           <p className="text-sm text-green-800 font-medium">
-            Smart Crop Advisor
+            AI-Powered Smart Crop Care for Farmers
           </p>
           <p className="text-xs text-green-600 mt-1">
-            AI-powered disease detection
+            AI-powered multilingual advisor
           </p>
         </div>
       </SidebarHeader>

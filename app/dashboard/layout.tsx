@@ -154,9 +154,9 @@ export default function DashboardLayout({
         <div className="h-screen max-h-screen overflow-hidden flex flex-col relative">
           <main className="flex-1 h-full overflow-auto w-full">
             {children}
-            <div className="absolute bottom-[10%] right-8 w-[250px]">
-              {/* <ElevenLabsConvai /> */}
-            </div>
+            {/* <div className="absolute bottom-[10%] right-8 w-[250px]">
+              <ElevenLabsConvai />
+            </div> */}
           </main>
         </div>
       </SidebarInset>

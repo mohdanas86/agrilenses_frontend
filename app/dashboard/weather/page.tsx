@@ -35,6 +35,7 @@ import {
   TrendingUp,
   TrendingDown,
   Leaf,
+  Loader2,
 } from "lucide-react";
 import {
   LineChart,
@@ -50,7 +51,47 @@ import {
 } from "recharts";
 import { useGlobalContext } from "@/context/GlobalContext";
 
-// Mock weather data structure
+// OpenWeatherMap forecast data types
+interface ForecastItem {
+  date: string;
+  time: string;
+  temperature: number;
+  feelsLike: number;
+  tempMin: number;
+  tempMax: number;
+  humidity: number;
+  pressure: number;
+  windSpeed: number;
+  windDirection: number;
+  windGust?: number;
+  weather: {
+    main: string;
+    description: string;
+    icon: string;
+  };
+  clouds: number;
+  visibility: number;
+  precipitationProbability: number;
+  isDay: boolean;
+}
+
+interface ForecastData {
+  location: {
+    name: string;
+    country: string;
+    coordinates: {
+      lat: number;
+      lon: number;
+    };
+    timezone: number;
+    sunrise: number;
+    sunset: number;
+  };
+  forecast: ForecastItem[];
+  lastUpdated: string;
+}
+
+// Mock weather data structure (keeping for fallback)
 interface WeatherData {
   id: string;
   location: string;
@@ -490,12 +531,176 @@ const mockWeatherData: WeatherData[] = [
       },
     ],
   },
+  {
+    id: "3",
+    location: "Chennai",
+    state: "Tamil Nadu",
+    coordinates: { lat: 13.0827, lng: 80.2707 },
+    current: {
+      temperature: 30,
+      feelsLike: 35,
+      humidity: 75,
+      windSpeed: 12,
+      windDirection: "SE",
+      pressure: 1010,
+      visibility: 8,
+      uvIndex: 8,
+      condition: "Sunny",
+      icon: "☀️",
+      description: "Hot and humid tropical weather",
+      lastUpdated: "2024-12-25 11:00 AM",
+    },
+    forecast: [
+      {
+        date: "2024-12-25",
+        day: "Today",
+        high: 32,
+        low: 24,
+        condition: "Sunny",
+        icon: "☀️",
+        humidity: 70,
+        windSpeed: 12,
+        precipitation: 0,
+        precipitationChance: 10,
+      },
+      {
+        date: "2024-12-26",
+        day: "Tomorrow",
+        high: 33,
+        low: 25,
+        condition: "Partly Cloudy",
+        icon: "⛅",
+        humidity: 68,
+        windSpeed: 10,
+        precipitation: 0,
+        precipitationChance: 20,
+      },
+      {
+        date: "2024-12-27",
+        day: "Thursday",
+        high: 31,
+        low: 23,
+        condition: "Light Rain",
+        icon: "🌦️",
+        humidity: 80,
+        windSpeed: 8,
+        precipitation: 2,
+        precipitationChance: 60,
+      },
+      {
+        date: "2024-12-28",
+        day: "Friday",
+        high: 30,
+        low: 22,
+        condition: "Cloudy",
+        icon: "☁️",
+        humidity: 75,
+        windSpeed: 9,
+        precipitation: 1,
+        precipitationChance: 40,
+      },
+      {
+        date: "2024-12-29",
+        day: "Saturday",
+        high: 29,
+        low: 21,
+        condition: "Sunny",
+        icon: "☀️",
+        humidity: 65,
+        windSpeed: 11,
+        precipitation: 0,
+        precipitationChance: 5,
+      },
+    ],
+    hourly: [
+      {
+        time: "6 AM",
+        temperature: 26,
+        condition: "Clear",
+        icon: "🌙",
+        windSpeed: 8,
+        humidity: 80,
+        precipitation: 0,
+      },
+      {
+        time: "9 AM",
+        temperature: 28,
+        condition: "Sunny",
+        icon: "☀️",
+        windSpeed: 10,
+        humidity: 75,
+        precipitation: 0,
+      },
+      {
+        time: "12 PM",
+        temperature: 31,
+        condition: "Sunny",
+        icon: "☀️",
+        windSpeed: 12,
+        humidity: 65,
+        precipitation: 0,
+      },
+      {
+        time: "3 PM",
+        temperature: 32,
+        condition: "Sunny",
+        icon: "☀️",
+        windSpeed: 14,
+        humidity: 60,
+        precipitation: 0,
+      },
+      {
+        time: "6 PM",
+        temperature: 30,
+        condition: "Partly Cloudy",
+        icon: "⛅",
+        windSpeed: 11,
+        humidity: 70,
+        precipitation: 0,
+      },
+      {
+        time: "9 PM",
+        temperature: 28,
+        condition: "Clear",
+        icon: "🌙",
+        windSpeed: 9,
+        humidity: 75,
+        precipitation: 0,
+      },
+    ],
+    agricultural: {
+      soilMoisture: 70,
+      evapotranspiration: 4.8,
+      growingDegreeDays: 12.5,
+      pestRisk: "medium",
+      diseaseRisk: "high",
+      irrigationAdvice: "Regular irrigation needed due to high temperatures",
+      fieldWorkSuitability: "fair",
+      recommendations: [
+        "Water crops early morning or evening to reduce evaporation",
+        "Monitor for fungal diseases due to high humidity",
+        "Apply mulch to conserve soil moisture",
+        "Consider shade nets for sensitive crops",
+      ],
+    },
+    alerts: [
+      {
+        id: "1",
+        type: "warning",
+        severity: "medium",
+        title: "Heat Wave Warning",
+        description: "Temperatures may exceed 35°C in some areas",
+        startTime: "2024-12-25 10:00",
+        endTime: "2024-12-27 18:00",
+      },
+    ],
+  },
 ];
 
 // Function to convert API data to our WeatherData format
 const convertApiToWeatherData = (apiData: any): WeatherData => {
   if (!apiData || !apiData.current || !apiData.location) {
-    return mockWeatherData[0]; // Fallback to Chennai mock data
+    return mockWeatherData[2]; // Fallback to Chennai mock data
   }
 
   const current = apiData.current;
@@ -599,11 +804,13 @@ export default function WeatherPage() {
     weatherCity,
     setWeatherCity,
   } = useGlobalContext();
+
+  // State for weather data
   const [weatherData, setWeatherData] =
     useState<WeatherData[]>(mockWeatherData);
   const [selectedLocation, setSelectedLocation] = useState<WeatherData>(
-    mockWeatherData[0]
-  );
+    mockWeatherData[2]
+  ); // Default to Chennai
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredLocations, setFilteredLocations] =
     useState<WeatherData[]>(mockWeatherData);
@@ -613,6 +820,55 @@ export default function WeatherPage() {
   const [lastRefresh, setLastRefresh] = useState(new Date());
   const [mounted, setMounted] = useState(false);
   const [isApiData, setIsApiData] = useState(false);
+
+  // New state for OpenWeatherMap forecast
+  const [forecastData, setForecastData] = useState<ForecastData | null>(null);
+  const [forecastLoading, setForecastLoading] = useState(false);
+  const [forecastError, setForecastError] = useState<string | null>(null);
+  const [selectedCoordinates, setSelectedCoordinates] = useState<{
+    lat: number;
+    lon: number;
+  } | null>(null);
+
+  // Function to fetch OpenWeatherMap forecast data
+  const fetchForecastData = async (
+    lat: number,
+    lon: number,
+    cityName?: string
+  ) => {
+    setForecastLoading(true);
+    setForecastError(null);
+
+    try {
+      const params = new URLSearchParams({
+        lat: lat.toString(),
+        lon: lon.toString(),
+      });
+
+      if (cityName) {
+        params.append("city", cityName);
+      }
+
+      const response = await fetch(
+        `/api/weather/forecast?${params.toString()}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch forecast: ${response.status}`);
+      }
+
+      const data: ForecastData = await response.json();
+      setForecastData(data);
+      setSelectedCoordinates({ lat, lon });
+    } catch (error) {
+      console.error("Error fetching forecast:", error);
+      setForecastError(
+        error instanceof Error ? error.message : "Failed to load forecast"
+      );
+    } finally {
+      setForecastLoading(false);
+    }
+  };
 
   // Handle client-side mounting
   useEffect(() => {
@@ -628,6 +884,15 @@ export default function WeatherPage() {
         setWeatherData(updatedWeatherData);
         setSelectedLocation(convertedData);
         setIsApiData(true);
+
+        // Fetch forecast data for the location
+        if (convertedData.coordinates) {
+          fetchForecastData(
+            convertedData.coordinates.lat,
+            convertedData.coordinates.lng,
+            convertedData.location
+          );
+        }
       } catch (error) {
         console.error("Error converting API data:", error);
         // Fallback to mock data
@@ -642,6 +907,17 @@ export default function WeatherPage() {
       setIsApiData(false);
     }
   }, [apiWeatherData]);
+
+  // Load forecast data when selected location changes
+  useEffect(() => {
+    if (selectedLocation && selectedLocation.coordinates) {
+      fetchForecastData(
+        selectedLocation.coordinates.lat,
+        selectedLocation.coordinates.lng,
+        selectedLocation.location
+      );
+    }
+  }, [selectedLocation]);
 
   // Filter locations based on search
   useEffect(() => {
@@ -661,10 +937,146 @@ export default function WeatherPage() {
         const currentCity = weatherCity || "chennai";
         setWeatherCity(currentCity); // This will trigger a re-fetch in GlobalContext
       }
+
+      // Also refresh forecast data if we have coordinates
+      if (selectedCoordinates) {
+        await fetchForecastData(
+          selectedCoordinates.lat,
+          selectedCoordinates.lon,
+          selectedLocation.location
+        );
+      }
+
       console.log("Refreshing weather data...");
     } catch (error) {
       console.error("Error refreshing weather:", error);
     }
+  };
+
+  // Helper function to get weather icon emoji
+  const getWeatherIcon = (icon: string) => {
+    // Handle WeatherAPI icon format (e.g., "day/116", "night/176")
+    if (icon.includes("/")) {
+      const iconCode = icon.split("/")[1];
+      const iconMap: { [key: string]: string } = {
+        "113": "☀️", // Sunny
+        "116": "⛅", // Partly cloudy
+        "119": "☁️", // Cloudy
+        "122": "☁️", // Overcast
+        "143": "🌫️", // Mist
+        "176": "🌦️", // Patchy rain nearby
+        "179": "🌨️", // Patchy snow nearby
+        "182": "🌨️", // Patchy sleet nearby
+        "185": "🌨️", // Patchy freezing drizzle nearby
+        "200": "⛈️", // Thundery outbreaks nearby
+        "227": "🌨️", // Blowing snow
+        "230": "🌨️", // Blizzard
+        "248": "🌫️", // Fog
+        "260": "🌫️", // Freezing fog
+        "263": "🌦️", // Patchy light drizzle
+        "266": "🌧️", // Light drizzle
+        "281": "🌧️", // Freezing drizzle
+        "284": "🌧️", // Heavy freezing drizzle
+        "293": "🌦️", // Patchy light rain
+        "296": "🌧️", // Light rain
+        "299": "🌧️", // Moderate rain at times
+        "302": "🌧️", // Moderate rain
+        "305": "🌧️", // Heavy rain at times
+        "308": "🌧️", // Heavy rain
+        "311": "🌧️", // Light freezing rain
+        "314": "🌧️", // Moderate or heavy freezing rain
+        "317": "🌨️", // Light sleet
+        "320": "🌨️", // Moderate or heavy sleet
+        "323": "🌨️", // Patchy light snow
+        "326": "🌨️", // Light snow
+        "329": "🌨️", // Patchy moderate snow
+        "332": "❄️", // Moderate snow
+        "335": "❄️", // Patchy heavy snow
+        "338": "❄️", // Heavy snow
+        "350": "🌧️", // Ice pellets
+        "353": "🌦️", // Light rain shower
+        "356": "🌧️", // Moderate or heavy rain shower
+        "359": "🌧️", // Torrential rain shower
+        "362": "🌨️", // Light sleet showers
+        "365": "🌨️", // Moderate or heavy sleet showers
+        "368": "🌨️", // Light snow showers
+        "371": "❄️", // Moderate or heavy snow showers
+        "374": "🌧️", // Light showers of ice pellets
+        "377": "🌧️", // Moderate or heavy showers of ice pellets
+        "386": "⛈️", // Patchy light rain with thunder
+        "389": "⛈️", // Moderate or heavy rain with thunder
+        "392": "⛈️", // Patchy light snow with thunder
+        "395": "⛈️", // Moderate or heavy snow with thunder
+      };
+      return iconMap[iconCode] || "🌤️";
+    }
+
+    // Fallback for other formats (OpenWeatherMap style)
+    const iconMap: { [key: string]: string } = {
+      "01d": "☀️",
+      "01n": "🌙", // clear sky
+      "02d": "🌤️",
+      "02n": "☁️", // few clouds
+      "03d": "⛅",
+      "03n": "☁️", // scattered clouds
+      "04d": "☁️",
+      "04n": "☁️", // broken clouds
+      "09d": "🌦️",
+      "09n": "🌧️", // shower rain
+      "10d": "🌦️",
+      "10n": "🌧️", // rain
+      "11d": "⛈️",
+      "11n": "⛈️", // thunderstorm
+      "13d": "❄️",
+      "13n": "❄️", // snow
+      "50d": "🌫️",
+      "50n": "🌫️", // mist
+    };
+    return iconMap[icon] || "🌤️";
+  };
+
+  // Helper function to group forecast by days
+  const groupForecastByDays = (forecast: ForecastItem[]) => {
+    const days: { [key: string]: ForecastItem[] } = {};
+    forecast.forEach((item) => {
+      if (!days[item.date]) {
+        days[item.date] = [];
+      }
+      days[item.date].push(item);
+    });
+    return days;
+  };
+
+  // Helper function to get daily summary from forecast
+  const getDailySummary = (dayForecast: ForecastItem[]) => {
+    if (dayForecast.length === 0) return null;
+
+    const temps = dayForecast.map((f) => f.temperature);
+    const humidities = dayForecast.map((f) => f.humidity);
+    const windSpeeds = dayForecast.map((f) => f.windSpeed);
+    const precipitations = dayForecast.map((f) => f.precipitationProbability);
+
+    const dayItem = dayForecast.find((f) => f.isDay) || dayForecast[0];
+
+    return {
+      date: dayForecast[0].date,
+      day: new Date(dayForecast[0].date).toLocaleDateString("en-US", {
+        weekday: "long",
+      }),
+      high: Math.max(...temps),
+      low: Math.min(...temps),
+      avgTemp: Math.round(temps.reduce((a, b) => a + b, 0) / temps.length),
+      avgHumidity: Math.round(
+        humidities.reduce((a, b) => a + b, 0) / humidities.length
+      ),
+      maxWindSpeed: Math.max(...windSpeeds),
+      maxPrecipitation: Math.max(...precipitations),
+      condition: dayItem.weather.main,
+      description: dayItem.weather.description,
+      icon: getWeatherIcon(dayItem.weather.icon),
+      sunrise: dayForecast[0].time, // Approximate
+      sunset: dayForecast[dayForecast.length - 1].time, // Approximate
+    };
   };
 
   const getSeverityColor = (severity: string) => {
@@ -806,7 +1218,7 @@ export default function WeatherPage() {
               size="sm"
               onClick={() => setCurrentView("forecast")}
             >
-              7-Day Forecast
+              5-Day Forecast
             </Button>
             <Button
               variant={currentView === "hourly" ? "default" : "outline"}
@@ -975,153 +1387,420 @@ export default function WeatherPage() {
         {/* 7-Day Forecast View */}
         {currentView === "forecast" && (
           <div className="space-y-6">
-            <Card className="shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-6 w-6 text-blue-600" />
-                  7-Day Weather Forecast
-                </CardTitle>
-                <CardDescription>
-                  Extended weather outlook for {selectedLocation.location}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {selectedLocation.forecast.map((day, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="text-2xl">{day.icon}</div>
-                        <div>
-                          <p className="font-semibold">{day.day}</p>
-                          <p className="text-sm text-gray-600">
-                            {day.condition}
-                          </p>
-                        </div>
+            {forecastLoading ? (
+              <Card className="shadow-lg">
+                <CardContent className="p-8 text-center">
+                  <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+                  <p className="text-gray-600">Loading forecast data...</p>
+                </CardContent>
+              </Card>
+            ) : forecastError ? (
+              <Card className="shadow-lg border-red-200">
+                <CardContent className="p-8 text-center">
+                  <AlertTriangle className="h-8 w-8 mx-auto mb-4 text-red-600" />
+                  <p className="text-red-600 mb-4">{forecastError}</p>
+                  <Button
+                    onClick={() =>
+                      selectedCoordinates &&
+                      fetchForecastData(
+                        selectedCoordinates.lat,
+                        selectedCoordinates.lon,
+                        selectedLocation.location
+                      )
+                    }
+                    variant="outline"
+                  >
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Retry
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : forecastData ? (
+              <Card className="shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Calendar className="h-6 w-6 text-blue-600" />
+                    5-Day Weather Forecast - {forecastData.location.name}
+                  </CardTitle>
+                  <CardDescription>
+                    Detailed weather outlook with farming insights • Last
+                    updated:{" "}
+                    {new Date(forecastData.lastUpdated).toLocaleString()}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {Object.entries(groupForecastByDays(forecastData.forecast))
+                      .slice(0, 5) // Show only 5 days
+                      .map(([date, dayForecast]) => {
+                        const summary = getDailySummary(dayForecast);
+                        if (!summary) return null;
+
+                        return (
+                          <div
+                            key={date}
+                            className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg border border-blue-100"
+                          >
+                            <div className="flex items-center gap-4">
+                              <div className="text-3xl">{summary.icon}</div>
+                              <div>
+                                <p className="font-semibold text-lg">
+                                  {summary.day}
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  {summary.description}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  {new Date(summary.date).toLocaleDateString()}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-6 text-center">
+                              <div>
+                                <p className="text-xl font-bold text-blue-600">
+                                  {summary.high}°/{summary.low}°
+                                </p>
+                                <p className="text-xs text-gray-600">
+                                  High/Low
+                                </p>
+                              </div>
+
+                              <div>
+                                <p className="text-sm font-semibold">
+                                  {summary.maxPrecipitation}%
+                                </p>
+                                <p className="text-xs text-gray-600">
+                                  Rain Chance
+                                </p>
+                              </div>
+
+                              <div>
+                                <p className="text-sm font-semibold">
+                                  {summary.maxWindSpeed} km/h
+                                </p>
+                                <p className="text-xs text-gray-600">Wind</p>
+                              </div>
+
+                              <div>
+                                <p className="text-sm font-semibold">
+                                  {summary.avgHumidity}%
+                                </p>
+                                <p className="text-xs text-gray-600">
+                                  Humidity
+                                </p>
+                              </div>
+
+                              {/* Farming Insights */}
+                              <div className="text-right">
+                                <div className="flex items-center gap-1 mb-1">
+                                  <Leaf className="h-4 w-4 text-green-600" />
+                                  <span className="text-xs font-medium">
+                                    Farming
+                                  </span>
+                                </div>
+                                <Badge
+                                  className={`text-xs ${
+                                    summary.maxPrecipitation > 70
+                                      ? "bg-blue-100 text-blue-800"
+                                      : summary.avgHumidity > 80
+                                      ? "bg-yellow-100 text-yellow-800"
+                                      : summary.high > 35
+                                      ? "bg-red-100 text-red-800"
+                                      : "bg-green-100 text-green-800"
+                                  }`}
+                                >
+                                  {summary.maxPrecipitation > 70
+                                    ? "Rain Expected"
+                                    : summary.avgHumidity > 80
+                                    ? "High Humidity"
+                                    : summary.high > 35
+                                    ? "Hot Day"
+                                    : "Good Conditions"}
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+
+                  {/* Agricultural Summary */}
+                  <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
+                    <h4 className="font-semibold text-green-800 mb-2 flex items-center gap-2">
+                      <Leaf className="h-5 w-5" />
+                      Agricultural Insights
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                      <div>
+                        <p className="font-medium text-green-700">
+                          Temperature Trend
+                        </p>
+                        <p className="text-green-600">
+                          {(() => {
+                            const temps = Object.values(
+                              groupForecastByDays(forecastData.forecast)
+                            )
+                              .slice(0, 5)
+                              .map((day) => getDailySummary(day)?.avgTemp || 0);
+                            const avgTemp =
+                              temps.reduce((a, b) => a + b, 0) / temps.length;
+                            return avgTemp > 30
+                              ? "Hot weather expected - protect crops from heat stress"
+                              : avgTemp > 25
+                              ? "Warm conditions suitable for most crops"
+                              : avgTemp > 15
+                              ? "Moderate temperatures good for growth"
+                              : "Cool weather - monitor for frost risk";
+                          })()}
+                        </p>
                       </div>
-
-                      <div className="flex items-center gap-6">
-                        <div className="text-center">
-                          <p className="text-lg font-bold">
-                            {day.high}°/{day.low}°
-                          </p>
-                          <p className="text-xs text-gray-600">High/Low</p>
-                        </div>
-
-                        <div className="text-center">
-                          <p className="text-sm font-semibold">
-                            {day.precipitationChance}%
-                          </p>
-                          <p className="text-xs text-gray-600">Rain</p>
-                        </div>
-
-                        <div className="text-center">
-                          <p className="text-sm font-semibold">
-                            {day.windSpeed} km/h
-                          </p>
-                          <p className="text-xs text-gray-600">Wind</p>
-                        </div>
-
-                        <div className="text-center">
-                          <p className="text-sm font-semibold">
-                            {day.humidity}%
-                          </p>
-                          <p className="text-xs text-gray-600">Humidity</p>
-                        </div>
+                      <div>
+                        <p className="font-medium text-green-700">
+                          Precipitation Outlook
+                        </p>
+                        <p className="text-green-600">
+                          {(() => {
+                            const rains = Object.values(
+                              groupForecastByDays(forecastData.forecast)
+                            )
+                              .slice(0, 5)
+                              .map(
+                                (day) =>
+                                  getDailySummary(day)?.maxPrecipitation || 0
+                              );
+                            const avgRain =
+                              rains.reduce((a, b) => a + b, 0) / rains.length;
+                            return avgRain > 60
+                              ? "Heavy rainfall expected - prepare drainage"
+                              : avgRain > 30
+                              ? "Moderate rain forecast - good for irrigation"
+                              : avgRain > 10
+                              ? "Light showers possible"
+                              : "Dry conditions - plan irrigation accordingly";
+                          })()}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="font-medium text-green-700">
+                          Field Work Suitability
+                        </p>
+                        <p className="text-green-600">
+                          {(() => {
+                            const winds = Object.values(
+                              groupForecastByDays(forecastData.forecast)
+                            )
+                              .slice(0, 5)
+                              .map(
+                                (day) => getDailySummary(day)?.maxWindSpeed || 0
+                              );
+                            const maxWind = Math.max(...winds);
+                            return maxWind > 25
+                              ? "Strong winds - delay field work"
+                              : maxWind > 15
+                              ? "Moderate winds - use caution"
+                              : "Calm conditions - good for field operations";
+                          })()}
+                        </p>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card className="shadow-lg">
+                <CardContent className="p-8 text-center">
+                  <Cloud className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                  <p className="text-gray-600 mb-4">
+                    No forecast data available
+                  </p>
+                  <Button
+                    onClick={() =>
+                      selectedCoordinates &&
+                      fetchForecastData(
+                        selectedCoordinates.lat,
+                        selectedCoordinates.lon,
+                        selectedLocation.location
+                      )
+                    }
+                  >
+                    Load Forecast
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
           </div>
         )}
 
         {/* Hourly View */}
         {currentView === "hourly" && (
           <div className="space-y-6">
-            <Card className="shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="h-6 w-6 text-blue-600" />
-                  Today's Hourly Forecast
-                </CardTitle>
-                <CardDescription>
-                  Hour-by-hour weather for {selectedLocation.location}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64 sm:h-80 mb-6">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={selectedLocation.hourly}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                      <XAxis
-                        dataKey="time"
-                        stroke="#6b7280"
-                        fontSize={12}
-                        tick={{ fill: "#6b7280" }}
-                      />
-                      <YAxis
-                        stroke="#6b7280"
-                        fontSize={12}
-                        tick={{ fill: "#6b7280" }}
-                        domain={["dataMin - 2", "dataMax + 2"]}
-                      />
-                      <Tooltip
-                        formatter={(value, name) => [
-                          `${value}°C`,
-                          "Temperature",
-                        ]}
-                        labelFormatter={(label) => `Time: ${label}`}
-                        contentStyle={{
-                          backgroundColor: "#ffffff",
-                          border: "1px solid #e5e7eb",
-                          borderRadius: "8px",
-                          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-                        }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="temperature"
-                        stroke="#3b82f6"
-                        strokeWidth={3}
-                        dot={{ fill: "#3b82f6", strokeWidth: 2, r: 5 }}
-                        activeDot={{
-                          r: 7,
-                          stroke: "#3b82f6",
-                          strokeWidth: 2,
-                          fill: "#ffffff",
-                        }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
+            {forecastData ? (
+              <Card className="shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Clock className="h-6 w-6 text-blue-600" />
+                    5-Day Hourly Forecast - {forecastData.location.name}
+                  </CardTitle>
+                  <CardDescription>
+                    Detailed hour-by-hour weather for the next 5 days • Last
+                    updated:{" "}
+                    {new Date(forecastData.lastUpdated).toLocaleString()}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {/* Temperature Chart */}
+                  <div className="h-64 sm:h-80 mb-6">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={forecastData.forecast.slice(0, 24)}>
+                        {" "}
+                        {/* Show first 24 hours */}
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                        <XAxis
+                          dataKey="time"
+                          stroke="#6b7280"
+                          fontSize={12}
+                          tick={{ fill: "#6b7280" }}
+                        />
+                        <YAxis
+                          stroke="#6b7280"
+                          fontSize={12}
+                          tick={{ fill: "#6b7280" }}
+                          domain={["dataMin - 2", "dataMax + 2"]}
+                        />
+                        <Tooltip
+                          formatter={(value, name) => [
+                            `${value}°C`,
+                            "Temperature",
+                          ]}
+                          labelFormatter={(label) => `Time: ${label}`}
+                          contentStyle={{
+                            backgroundColor: "#ffffff",
+                            border: "1px solid #e5e7eb",
+                            borderRadius: "8px",
+                            boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                          }}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="temperature"
+                          stroke="#3b82f6"
+                          strokeWidth={3}
+                          dot={{ fill: "#3b82f6", strokeWidth: 2, r: 4 }}
+                          activeDot={{
+                            r: 6,
+                            stroke: "#3b82f6",
+                            strokeWidth: 2,
+                            fill: "#ffffff",
+                          }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                  {selectedLocation.hourly.map((hour, index) => (
-                    <div
-                      key={index}
-                      className="text-center p-3 bg-gray-50 rounded-lg"
-                    >
-                      <p className="text-sm font-semibold mb-2">{hour.time}</p>
-                      <div className="text-2xl mb-2">{hour.icon}</div>
-                      <p className="text-lg font-bold text-blue-600 mb-1">
-                        {hour.temperature}°C
-                      </p>
-                      <p className="text-xs text-gray-600 mb-1">
-                        {hour.condition}
-                      </p>
-                      <div className="space-y-1">
-                        <p className="text-xs">💨 {hour.windSpeed} km/h</p>
-                        <p className="text-xs">💧 {hour.humidity}%</p>
+                  {/* Hourly Details Grid */}
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                    {forecastData.forecast.slice(0, 24).map((hour, index) => (
+                      <div
+                        key={index}
+                        className="text-center p-3 bg-gradient-to-br from-blue-50 to-white rounded-lg border border-blue-100"
+                      >
+                        <p className="text-sm font-semibold mb-2">
+                          {hour.time}
+                        </p>
+                        <div className="text-2xl mb-2">
+                          {getWeatherIcon(hour.weather.icon)}
+                        </div>
+                        <p className="text-lg font-bold text-blue-600 mb-1">
+                          {hour.temperature}°C
+                        </p>
+                        <p className="text-xs text-gray-600 mb-1">
+                          {hour.weather.description}
+                        </p>
+                        <div className="space-y-1 text-xs">
+                          <p>💨 {hour.windSpeed} km/h</p>
+                          <p>💧 {hour.humidity}%</p>
+                          <p>🌧️ {hour.precipitationProbability}%</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Farming Hourly Insights */}
+                  <div className="mt-6 p-4 bg-amber-50 rounded-lg border border-amber-200">
+                    <h4 className="font-semibold text-amber-800 mb-2 flex items-center gap-2">
+                      <Sun className="h-5 w-5" />
+                      Hourly Farming Recommendations
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <p className="font-medium text-amber-700">
+                          Best Irrigation Times
+                        </p>
+                        <p className="text-amber-600">
+                          {(() => {
+                            const coolHours = forecastData.forecast
+                              .slice(0, 24)
+                              .filter(
+                                (h) =>
+                                  h.temperature < 30 &&
+                                  h.precipitationProbability < 30
+                              );
+                            return coolHours.length > 0
+                              ? `${coolHours[0].time} - ${
+                                  coolHours[Math.min(4, coolHours.length - 1)]
+                                    .time
+                                }`
+                              : "No optimal times in next 24 hours";
+                          })()}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="font-medium text-amber-700">
+                          Spraying Conditions
+                        </p>
+                        <p className="text-amber-600">
+                          {(() => {
+                            const goodConditions = forecastData.forecast
+                              .slice(0, 24)
+                              .filter(
+                                (h) =>
+                                  h.windSpeed < 15 &&
+                                  h.precipitationProbability < 50 &&
+                                  h.humidity < 85
+                              );
+                            return goodConditions.length > 0
+                              ? `Good conditions from ${goodConditions[0].time}`
+                              : "Poor conditions for spraying";
+                          })()}
+                        </p>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card className="shadow-lg">
+                <CardContent className="p-8 text-center">
+                  <Clock className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                  <p className="text-gray-600 mb-4">
+                    Hourly forecast requires location coordinates
+                  </p>
+                  <Button
+                    onClick={() =>
+                      selectedCoordinates &&
+                      fetchForecastData(
+                        selectedCoordinates.lat,
+                        selectedCoordinates.lon,
+                        selectedLocation.location
+                      )
+                    }
+                  >
+                    Load Hourly Data
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
           </div>
         )}
 

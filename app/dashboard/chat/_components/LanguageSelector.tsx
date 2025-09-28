@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Languages } from "lucide-react";
-import type { Language } from "../page";
+import type { Language } from "../ChatBot";
 
 interface LanguageSelectorProps {
   languages: Language[];

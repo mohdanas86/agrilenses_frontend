@@ -8,8 +8,6 @@ import Hero from "./_components/Hero";
 import Footer from "./_components/Footer";
 import Models from "./_components/Models";
 
-import "@11labs/convai-widget-core";
-
 const HomePage = () => {
   const { isSignedIn, isLoaded } = useUser();
   const router = useRouter();
@@ -19,6 +17,9 @@ const HomePage = () => {
     if (isLoaded && isSignedIn) {
       router.push("/dashboard");
     }
+
+    // Load ElevenLabs widget only on client side
+    import("@11labs/convai-widget-core");
   }, [isLoaded, isSignedIn, router]);
 
   // Show loading state while checking authentication

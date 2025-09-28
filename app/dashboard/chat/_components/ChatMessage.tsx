@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Volume2, VolumeX, User, Bot, Copy, Check } from "lucide-react";
-import type { ChatMessageType, Language } from "../page";
+import type { ChatMessageType, Language } from "../ChatBot";
 
 interface ChatMessageProps {
   message: ChatMessageType;

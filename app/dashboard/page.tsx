@@ -28,6 +28,65 @@ import {
   AlertTriangle,
   MessageCircle,
   Building2,
+  PhoneCall,
+  Languages,
+  CloudSun,
+  IndianRupee,
+  Sprout,
+  Bot,
+  Scan as ScanIcon,
+  Mic,
+  Mic2,
+  Volume2,
+  CheckCircle,
+  AlertCircle,
+  Zap,
+  Users,
+  Award,
+  Target,
+  MapPin,
+  Calendar,
+  Clock,
+  Star,
+  Heart,
+  Info,
+  Settings,
+  HelpCircle,
+  Mail,
+  Phone,
+  Globe,
+  Play,
+  Pause,
+  RotateCcw,
+  RotateCw,
+  Maximize,
+  Minimize,
+  X,
+  Menu,
+  Home,
+  User,
+  LogOut,
+  Bell,
+  Eye,
+  EyeOff,
+  Lock,
+  Unlock,
+  Plus,
+  Minus,
+  Edit,
+  Trash,
+  Save,
+  Download,
+  Upload,
+  Share,
+  Link as LinkIcon,
+  ExternalLink,
+  Copy,
+  RefreshCw,
+  Loader,
+  Loader2,
+  Check,
+  XCircle,
 } from "lucide-react";
 import {
   LineChart,
@@ -45,6 +104,9 @@ import {
 import { cropModels } from "./scanner/_components";
 import { useGlobalContext } from "@/context/GlobalContext";
 import { useHistoryState } from "./history/_components/useHistoryState";
+import ElevenLabsConvai from "./ElevenLabsConvai";
+import ChatBot from "./chat/ChatBot";
+import ElevenLabsWidget from "@/components/ElevenLabsWidget";
 
 // Types
 interface WeatherData {
@@ -227,19 +289,307 @@ export default function AgriLensDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-800">
-      <main className="max-w-screen-2xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
-        {/* Welcome Header */}
-        <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            Welcome to AgriLenses
-          </h1>
-          <p className="text-sm sm:text-md text-gray-600 mt-1">
-            AI-powered crop disease detection for healthier harvests
-          </p>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1">
-            {currentTime ? formatTime(currentTime) : ""}
-          </p>
+    <div className="min-h-screen bg-gradient-to-b from-[#FAF9F6] via-white to-[#FAF9F6] text-gray-800">
+      <main className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* Header / Branding */}
+        <div className="mb-8 sm:mb-12">
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-2xl bg-[#2F855A] text-white flex items-center justify-center shadow-lg">
+                <Sprout className="h-6 w-6 sm:h-8 sm:w-8" />
+              </div>
+              <div>
+                <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-[#2F855A]">
+                  AgriLenses
+                </h1>
+                <p className="text-sm sm:text-lg text-[#2F855A]/80 font-medium">
+                  Smart Multilingual AI Crop Advisor
+                </p>
+              </div>
+            </div>
+            <p className="text-sm sm:text-base text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Helping 86% of India's small & marginal farmers with instant
+              advice in their own language.
+            </p>
+          </div>
+        </div>
+
+        {/* Hero Impact Section */}
+        <div className="mb-8 sm:mb-12">
+          <Card className="rounded-2xl border border-[#2F855A]/20 bg-white/95 backdrop-blur shadow-xl overflow-hidden">
+            <CardContent className="p-6 sm:p-8">
+              <div className="text-center mb-6">
+                <h2 className="text-2xl sm:text-3xl font-bold text-[#2F855A] mb-2">
+                  What Farmers Get in 30 Seconds
+                </h2>
+                <p className="text-gray-600 text-sm sm:text-base">
+                  Instant AI-powered farming assistance at your fingertips
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+                <div className="flex items-center gap-3 p-4 bg-[#FAF9F6] rounded-xl border border-[#2F855A]/10">
+                  <div className="p-2 bg-[#2F855A] rounded-lg text-white">
+                    <Mic className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-[#2F855A] text-sm">
+                      Voice Commands
+                    </p>
+                    <p className="text-xs text-gray-600">
+                      Ask in Hindi, Tamil, or English
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-4 bg-[#FAF9F6] rounded-xl border border-[#2F855A]/10">
+                  <div className="p-2 bg-[#2F855A] rounded-lg text-white">
+                    <ScanIcon className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-[#2F855A] text-sm">
+                      Instant Disease Scan
+                    </p>
+                    <p className="text-xs text-gray-600">
+                      AI detects crop problems
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-4 bg-[#FAF9F6] rounded-xl border border-[#2F855A]/10">
+                  <div className="p-2 bg-[#2F855A] rounded-lg text-white">
+                    <CloudSun className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-[#2F855A] text-sm">
+                      Real-time Weather
+                    </p>
+                    <p className="text-xs text-gray-600">
+                      Village-specific forecasts
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-4 bg-[#FAF9F6] rounded-xl border border-[#2F855A]/10">
+                  <div className="p-2 bg-[#2F855A] rounded-lg text-white">
+                    <TrendingUp className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-[#2F855A] text-sm">
+                      Market Prices
+                    </p>
+                    <p className="text-xs text-gray-600">Today's mandi rates</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-center">
+                <Link href="/dashboard/scanner">
+                  <Button
+                    size="lg"
+                    className="bg-[#2F855A] hover:bg-[#2F855A]/90 text-white font-bold px-8 py-3 text-lg shadow-lg"
+                  >
+                    <Play className="mr-2 h-5 w-5" />
+                    Start Demo
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Impact Stats - Farmer Benefits */}
+        <div className="mb-8 sm:mb-12">
+          <div className="text-center mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-[#2F855A] mb-2">
+              Real Farmer Impact
+            </h2>
+            <p className="text-gray-600 text-sm sm:text-base">
+              Measurable benefits delivered to farmers across India
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <Card className="text-center p-4 sm:p-6 bg-gradient-to-br from-[#2F855A]/5 to-[#2F855A]/10 border-[#2F855A]/20">
+              <div className="flex justify-center mb-3">
+                <div className="p-3 bg-[#2F855A] rounded-full text-white">
+                  <CheckCircle className="h-6 w-6" />
+                </div>
+              </div>
+              <div className="text-2xl sm:text-3xl font-bold text-[#2F855A] mb-1">
+                12
+              </div>
+              <p className="text-sm font-medium text-gray-700">Crops Saved</p>
+              <p className="text-xs text-gray-600">This week</p>
+            </Card>
+
+            <Card className="text-center p-4 sm:p-6 bg-gradient-to-br from-[#E53E3E]/5 to-[#E53E3E]/10 border-[#E53E3E]/20">
+              <div className="flex justify-center mb-3">
+                <div className="p-3 bg-[#E53E3E] rounded-full text-white">
+                  <AlertTriangle className="h-6 w-6" />
+                </div>
+              </div>
+              <div className="text-2xl sm:text-3xl font-bold text-[#E53E3E] mb-1">
+                7
+              </div>
+              <p className="text-sm font-medium text-gray-700">
+                Diseases Detected
+              </p>
+              <p className="text-xs text-gray-600">Early prevention</p>
+            </Card>
+
+            <Card className="text-center p-4 sm:p-6 bg-gradient-to-br from-[#F6AD55]/5 to-[#F6AD55]/10 border-[#F6AD55]/20">
+              <div className="flex justify-center mb-3">
+                <div className="p-3 bg-[#F6AD55] rounded-full text-white">
+                  <Droplets className="h-6 w-6" />
+                </div>
+              </div>
+              <div className="text-2xl sm:text-3xl font-bold text-[#F6AD55] mb-1">
+                120L
+              </div>
+              <p className="text-sm font-medium text-gray-700">Water Saved</p>
+              <p className="text-xs text-gray-600">Per farmer</p>
+            </Card>
+
+            <Card className="text-center p-4 sm:p-6 bg-gradient-to-br from-[#2F855A]/5 to-[#2F855A]/10 border-[#2F855A]/20">
+              <div className="flex justify-center mb-3">
+                <div className="p-3 bg-[#2F855A] rounded-full text-white">
+                  <TrendingUp className="h-6 w-6" />
+                </div>
+              </div>
+              <div className="text-2xl sm:text-3xl font-bold text-[#2F855A] mb-1">
+                +25%
+              </div>
+              <p className="text-sm font-medium text-gray-700">
+                Yield Potential
+              </p>
+              <p className="text-xs text-gray-600">Increase achieved</p>
+            </Card>
+          </div>
+        </div>
+
+        {/* AI Advisor Section - Enhanced */}
+        <div className="mb-8 sm:mb-12">
+          <div className="text-center mb-6 sm:mb-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#2F855A] mb-2">
+              AI Farming Assistant
+            </h2>
+            <p className="text-gray-600 text-sm sm:text-base max-w-2xl mx-auto">
+              Get instant expert advice on crop diseases, weather, farming
+              techniques, and more in your preferred language
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 sm:gap-8">
+            {/* Main Chat Interface */}
+            <div className="xl:col-span-2">
+              <Card className="rounded-2xl border border-[#2F855A]/20 bg-white/95 backdrop-blur shadow-xl overflow-hidden">
+                <CardHeader className="bg-gradient-to-r from-[#2F855A] to-[#2F855A]/80 text-white pb-0">
+                  <CardTitle className="text-lg sm:text-xl font-bold flex items-center gap-3">
+                    <MessageCircle className="h-6 w-6" />
+                    Chat with AgriLens AI
+                  </CardTitle>
+                  <CardDescription className="text-[#2F855A]/20 text-sm sm:text-base">
+                    Ask questions in English, Hindi, or Tamil • Voice & text
+                    support
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <ChatBot heightValue="h-[500px] sm:h-[550px]" />
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Quick Actions & Support */}
+            <div className="space-y-4 sm:space-y-6">
+              {/* Voice Call Support */}
+              <Card className="rounded-2xl border border-[#2F855A]/20 bg-gradient-to-br from-[#FAF9F6] to-[#2F855A]/5 shadow-lg">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base sm:text-lg font-bold flex items-center gap-2 text-[#2F855A]">
+                    <Mic className="h-5 w-5 text-[#2F855A]" />
+                    Voice Support
+                  </CardTitle>
+                  <CardDescription className="text-[#2F855A]/80">
+                    Instant voice assistance in multiple languages
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="text-sm text-gray-600 bg-white/70 p-3 rounded-lg">
+                    Tap the call button and speak naturally. Our AI understands
+                    Hindi, Tamil, and English.
+                  </div>
+                  <div className="bg-white/80 p-4 rounded-xl border border-[#2F855A]/20">
+                    <ElevenLabsConvai />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Quick Tips */}
+              <Card className="rounded-2xl border border-[#F6AD55]/20 bg-gradient-to-br from-[#F6AD55]/5 to-[#F6AD55]/10 shadow-lg">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base sm:text-lg font-bold flex items-center gap-2 text-[#F6AD55]">
+                    <Lightbulb className="h-5 w-5 text-[#F6AD55]" />
+                    Quick Tips
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-start gap-2 p-2 bg-white/70 rounded-lg">
+                      <Camera className="h-4 w-4 text-[#F6AD55] flex-shrink-0 mt-0.5" />
+                      <span className="text-gray-700">
+                        Upload clear, well-lit plant photos for better disease
+                        detection
+                      </span>
+                    </div>
+                    <div className="flex items-start gap-2 p-2 bg-white/70 rounded-lg">
+                      <CloudSun className="h-4 w-4 text-[#F6AD55] flex-shrink-0 mt-0.5" />
+                      <span className="text-gray-700">
+                        Check weather forecasts before applying pesticides
+                      </span>
+                    </div>
+                    <div className="flex items-start gap-2 p-2 bg-white/70 rounded-lg">
+                      <Phone className="h-4 w-4 text-[#F6AD55] flex-shrink-0 mt-0.5" />
+                      <span className="text-gray-700">
+                        Use voice commands for hands-free farming assistance
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Language Support */}
+              <Card className="rounded-2xl border border-[#2F855A]/20 bg-gradient-to-br from-[#2F855A]/5 to-[#2F855A]/10 shadow-lg">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base sm:text-lg font-bold flex items-center gap-2 text-[#2F855A]">
+                    <Languages className="h-5 w-5 text-[#2F855A]" />
+                    Multi-Language
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="text-center p-2 bg-white/70 rounded-lg">
+                      <Globe className="h-5 w-5 mx-auto mb-1 text-[#2F855A]" />
+                      <div className="text-xs font-medium text-gray-700">
+                        English
+                      </div>
+                    </div>
+                    <div className="text-center p-2 bg-white/70 rounded-lg">
+                      <Globe className="h-5 w-5 mx-auto mb-1 text-[#2F855A]" />
+                      <div className="text-xs font-medium text-gray-700">
+                        हिंदी
+                      </div>
+                    </div>
+                    <div className="text-center p-2 bg-white/70 rounded-lg">
+                      <Globe className="h-5 w-5 mx-auto mb-1 text-[#2F855A]" />
+                      <div className="text-xs font-medium text-gray-700">
+                        தமிழ்
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 sm:gap-6">
@@ -247,57 +597,57 @@ export default function AgriLensDashboard() {
           <div className="xl:col-span-3 space-y-4 sm:space-y-6">
             {/* Priority 1: Quick Stats Overview - Key Metrics */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-              <Card className="shadow-md border-l-4 border-l-blue-500 bg-blue-50/30">
+              <Card className="shadow-sm border-l-4 border-l-emerald-500 bg-emerald-50/40">
                 <CardContent className="p-3 sm:p-4">
                   <div className="flex items-center gap-2">
-                    <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+                    <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
                     <p className="text-xs sm:text-sm font-semibold text-gray-700">
-                      Total Scans
+                      Total
                     </p>
                   </div>
-                  <p className="text-xl sm:text-3xl font-bold text-blue-600 mt-1">
+                  <p className="text-xl sm:text-3xl font-extrabold text-emerald-700 mt-1">
                     {historyLoading ? "..." : getStats().totalScans}
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="shadow-md border-l-4 border-l-green-500 bg-green-50/30">
+              <Card className="shadow-sm border-l-4 border-l-green-500 bg-green-50/50">
                 <CardContent className="p-3 sm:p-4">
                   <div className="flex items-center gap-2">
                     <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
                     <p className="text-xs sm:text-sm font-semibold text-gray-700">
-                      Healthy Plants
+                      Healthy
                     </p>
                   </div>
-                  <p className="text-xl sm:text-3xl font-bold text-green-600 mt-1">
+                  <p className="text-xl sm:text-3xl font-extrabold text-green-700 mt-1">
                     {historyLoading ? "..." : getStats().healthyCount}
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="shadow-md border-l-4 border-l-red-500 bg-red-50/30">
+              <Card className="shadow-sm border-l-4 border-l-red-500 bg-red-50/50">
                 <CardContent className="p-3 sm:p-4">
                   <div className="flex items-center gap-2">
                     <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
                     <p className="text-xs sm:text-sm font-semibold text-gray-700">
-                      Diseases Found
+                      Diseased
                     </p>
                   </div>
-                  <p className="text-xl sm:text-3xl font-bold text-red-600 mt-1">
+                  <p className="text-xl sm:text-3xl font-extrabold text-red-700 mt-1">
                     {historyLoading ? "..." : getStats().diseasedCount}
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="shadow-md border-l-4 border-l-purple-500 bg-purple-50/30">
+              <Card className="shadow-sm border-l-4 border-l-purple-500 bg-purple-50/50">
                 <CardContent className="p-3 sm:p-4">
                   <div className="flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
                     <p className="text-xs sm:text-sm font-semibold text-gray-700">
-                      Success Rate
+                      Success
                     </p>
                   </div>
-                  <p className="text-xl sm:text-3xl font-bold text-purple-600 mt-1">
+                  <p className="text-xl sm:text-3xl font-extrabold text-purple-700 mt-1">
                     {historyLoading ? "..." : `${getStats().successRate}%`}
                   </p>
                 </CardContent>
@@ -307,54 +657,54 @@ export default function AgriLensDashboard() {
             {/* Priority 2: Analytics & Charts Section - Detailed Analysis */}
             <div className="space-y-4 sm:space-y-6">
               {/* Analytics Header */}
-              <div className="flex items-center gap-2 border-l-4 border-l-green-500 pl-3">
-                <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
-                <h2 className="text-lg sm:text-xl font-bold text-gray-900">
-                  Analytics & Trends
+              <div className="flex items-center gap-2 border-l-4 border-l-emerald-500 pl-3">
+                <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-700" />
+                <h2 className="text-lg sm:text-xl font-extrabold text-gray-900">
+                  Insights
                 </h2>
               </div>
 
               {/* Charts Row */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 {/* Line Chart - Tomato & Potato Disease Detection */}
-                <Card className="shadow-sm">
-                  <CardHeader>
+                <Card className="shadow-sm rounded-2xl border border-emerald-100 p-0 max-h-[420px] flex flex-col bg-white/90 backdrop-blur">
+                  <CardHeader className="pb-2">
                     <CardTitle className="text-lg flex items-center gap-2">
                       <div className="h-2 w-2 bg-red-500 rounded-full"></div>
-                      Disease Detection Trends
+                      Disease Trends (7d)
                     </CardTitle>
-                    <CardDescription>
-                      Number of diseased plants detected in Tomato & Potato over
-                      the last 7 days
-                    </CardDescription>
+                    <CardDescription>Tomato vs Potato</CardDescription>
                   </CardHeader>
-                  <CardContent>
+
+                  <CardContent className="pt-4 flex-1">
                     {historyLoading ? (
-                      <div className="flex items-center justify-center h-48 sm:h-64">
-                        <div className="text-gray-500">Loading chart...</div>
+                      <div className="flex items-center justify-center h-[200px]">
+                        <div className="text-gray-500 text-sm sm:text-base">
+                          Loading chart...
+                        </div>
                       </div>
                     ) : lineChartData.length === 0 ? (
-                      <div className="flex items-center justify-center h-48 sm:h-64">
+                      <div className="flex items-center justify-center h-[200px]">
                         <div className="text-center text-gray-500">
-                          <div className="w-12 h-12 mx-auto mb-2 bg-gray-100 rounded-full flex items-center justify-center">
-                            <BarChart3 className="h-6 w-6 text-gray-400" />
+                          <div className="w-14 h-14 mx-auto mb-3 bg-gray-100 rounded-full flex items-center justify-center">
+                            <BarChart3 className="h-7 w-7 text-gray-400" />
                           </div>
-                          <div>No data available</div>
-                          <div className="text-sm">
+                          <div className="font-medium">No data available</div>
+                          <div className="text-xs sm:text-sm">
                             Start scanning plants to see trends
                           </div>
                         </div>
                       </div>
                     ) : (
-                      <div className="h-56 sm:h-72 lg:h-80">
-                        <ResponsiveContainer width="100%" height="100%">
+                      <div className="h-[220px]">
+                        <ResponsiveContainer width="100%" height={220}>
                           <LineChart
                             data={lineChartData}
                             margin={{
                               top: 20,
                               right: 20,
                               left: 10,
-                              bottom: 40,
+                              bottom: 30,
                             }}
                           >
                             <defs>
@@ -395,26 +745,35 @@ export default function AgriLensDashboard() {
                                 />
                               </linearGradient>
                             </defs>
+
                             <CartesianGrid
                               strokeDasharray="3 3"
                               stroke="#e5e7eb"
                               opacity={0.6}
                               vertical={false}
                             />
+
                             <XAxis
                               dataKey="date"
                               stroke="#6b7280"
                               fontSize={12}
                               tick={{ fill: "#6b7280" }}
-                              axisLine={{ stroke: "#d1d5db", strokeWidth: 1 }}
-                              tickLine={{ stroke: "#d1d5db", strokeWidth: 1 }}
+                              axisLine={{ stroke: "#d1d5db" }}
+                              tickLine={{ stroke: "#d1d5db" }}
                               tickMargin={10}
-                              height={60}
+                              height={50}
                             />
+
                             <YAxis
                               stroke="#6b7280"
                               fontSize={12}
                               domain={[0, "dataMax + 1"]}
+                              allowDecimals={false}
+                              tick={{ fill: "#6b7280" }}
+                              axisLine={{ stroke: "#d1d5db" }}
+                              tickLine={{ stroke: "#d1d5db" }}
+                              tickMargin={10}
+                              width={60}
                               label={{
                                 value: "Diseased Plants",
                                 angle: -90,
@@ -425,28 +784,19 @@ export default function AgriLensDashboard() {
                                   fill: "#6b7280",
                                 },
                               }}
-                              allowDecimals={false}
-                              tick={{ fill: "#6b7280" }}
-                              axisLine={{ stroke: "#d1d5db", strokeWidth: 1 }}
-                              tickLine={{ stroke: "#d1d5db", strokeWidth: 1 }}
-                              tickMargin={10}
-                              width={60}
                             />
+
                             <Tooltip
                               formatter={(value, name) => [
                                 `${value} diseased plants`,
-                                name === "tomato"
-                                  ? "🍅 Tomato Diseases"
-                                  : "🥔 Potato Diseases",
+                                name === "tomato" ? "Tomato" : "Potato",
                               ]}
-                              labelFormatter={(label) => `📅 ${label}`}
+                              labelFormatter={(label) => `${label}`}
                               contentStyle={{
-                                backgroundColor: "#ffffff",
+                                backgroundColor: "#fff",
                                 border: "1px solid #e5e7eb",
                                 borderRadius: "12px",
-                                boxShadow:
-                                  "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-                                padding: "12px 16px",
+                                padding: "10px 14px",
                                 fontSize: "13px",
                                 fontWeight: "500",
                               }}
@@ -456,14 +806,16 @@ export default function AgriLensDashboard() {
                                 strokeDasharray: "5,5",
                               }}
                             />
+
                             <Legend
                               wrapperStyle={{
-                                paddingTop: "20px",
+                                paddingTop: "10px",
                                 fontSize: "13px",
                                 fontWeight: "500",
                               }}
                               iconType="circle"
                             />
+
                             <Line
                               type="monotone"
                               dataKey="tomato"
@@ -471,19 +823,20 @@ export default function AgriLensDashboard() {
                               strokeWidth={3}
                               dot={{
                                 fill: "#ef4444",
+                                stroke: "#fff",
                                 strokeWidth: 2,
                                 r: 4,
-                                stroke: "#ffffff",
                               }}
                               activeDot={{
                                 r: 6,
                                 stroke: "#ef4444",
                                 strokeWidth: 2,
-                                fill: "#ffffff",
+                                fill: "#fff",
                               }}
                               name="Tomato Diseases"
-                              connectNulls={false}
+                              connectNulls
                             />
+
                             <Line
                               type="monotone"
                               dataKey="potato"
@@ -491,18 +844,18 @@ export default function AgriLensDashboard() {
                               strokeWidth={3}
                               dot={{
                                 fill: "#f59e0b",
+                                stroke: "#fff",
                                 strokeWidth: 2,
                                 r: 4,
-                                stroke: "#ffffff",
                               }}
                               activeDot={{
                                 r: 6,
                                 stroke: "#f59e0b",
                                 strokeWidth: 2,
-                                fill: "#ffffff",
+                                fill: "#fff",
                               }}
                               name="Potato Diseases"
-                              connectNulls={false}
+                              connectNulls
                             />
                           </LineChart>
                         </ResponsiveContainer>
@@ -512,23 +865,21 @@ export default function AgriLensDashboard() {
                 </Card>
 
                 {/* Enhanced Bar Chart */}
-                <Card className="shadow-sm">
+                <Card className="shadow-sm max-h-[420px] flex flex-col border border-emerald-100 bg-white/90 backdrop-blur rounded-2xl">
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
                       <div className="h-2 w-2 bg-green-500 rounded-full"></div>
-                      Plant Health Distribution
+                      Health Mix
                     </CardTitle>
-                    <CardDescription>
-                      Overall health status of scanned plants
-                    </CardDescription>
+                    <CardDescription>Healthy vs Diseased</CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="flex-1">
                     {historyLoading ? (
-                      <div className="flex items-center justify-center h-48 sm:h-64">
+                      <div className="flex items-center justify-center h-[200px]">
                         <div className="text-gray-500">Loading chart...</div>
                       </div>
                     ) : barChartData.length === 0 ? (
-                      <div className="flex items-center justify-center h-48 sm:h-64">
+                      <div className="flex items-center justify-center h-[200px]">
                         <div className="text-center text-gray-500">
                           <div className="w-12 h-12 mx-auto mb-2 bg-gray-100 rounded-full flex items-center justify-center">
                             <Activity className="h-6 w-6 text-gray-400" />
@@ -540,8 +891,8 @@ export default function AgriLensDashboard() {
                         </div>
                       </div>
                     ) : (
-                      <div className="w-full h-64 sm:h-72 lg:h-80 overflow-hidden">
-                        <ResponsiveContainer width="100%" height="100%">
+                      <div className="w-full h-[220px] overflow-hidden">
+                        <ResponsiveContainer width="100%" height={220}>
                           <BarChart
                             data={barChartData}
                             margin={{
@@ -625,8 +976,8 @@ export default function AgriLensDashboard() {
                                   )?.percentage || 0
                                 }%)`,
                                 name === "Healthy Plants"
-                                  ? "🌱 Healthy"
-                                  : "🚨 Diseased",
+                                  ? "Healthy"
+                                  : "Diseased",
                               ]}
                               contentStyle={{
                                 backgroundColor: "#ffffff",
@@ -700,54 +1051,44 @@ export default function AgriLensDashboard() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* Priority 1: Scan Your Crop Card - Most Important */}
-              <div className="bg-green-600 rounded-xl p-6 text-white shadow-lg border-2 border-green-400">
+              <div className="bg-gradient-to-br from-emerald-600 to-green-600 rounded-2xl p-6 text-white shadow-lg border border-emerald-500/50">
                 <div className="flex items-start gap-4">
-                  <div className="bg-green-500 p-3 rounded-full shadow-lg">
+                  <div className="bg-white/15 p-3 rounded-full shadow-lg">
                     <Camera className="h-6 w-6" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-semibold">
-                      Start Disease Detection
-                    </h2>
-                    <p className="text-green-100 mt-1 font-medium">
-                      Take a photo of your crop leaf for instant AI-powered
-                      disease detection and get treatment recommendations
-                      immediately
+                    <h2 className="text-xl font-bold">Start Scan</h2>
+                    <p className="text-emerald-100 mt-1 font-medium text-sm">
+                      Instant AI-powered disease detection and get treatment
+                      recommendations immediately
                     </p>
                   </div>
                 </div>
-                <Link href={"/dashboard/scanner"} className="currsor-pointer">
-                  <Button
-                    size="lg"
-                    className="w-full bg-white text-green-700 hover:bg-green-50 font-bold text-lg mt-4 py-6 flex justify-between items-center cursor-pointer shadow-md"
-                    // onClick={() => router.push("/dashboard/scanner")}
-                  >
-                    Start Scanning Now
+                <Link href={"/dashboard/scanner"} className="cursor-pointer">
+                  <Button className="w-full bg-white text-emerald-700 hover:bg-emerald-50 font-bold text-lg mt-4 py-5 text-md flex justify-between items-center cursor-pointer shadow-md">
+                    Scanning Now
                     <ChevronRight className="h-6 w-6" />
                   </Button>
                 </Link>
               </div>
 
               {/* NEW: AI Chat Assistant Card */}
-              <div className="bg-blue-600 rounded-xl p-6 text-white shadow-lg border-2 border-blue-400">
+              <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg border border-blue-500/50">
                 <div className="flex items-start gap-4">
-                  <div className="bg-blue-500 p-3 rounded-full shadow-lg">
+                  <div className="bg-white/15 p-3 rounded-full shadow-lg">
                     <MessageCircle className="h-6 w-6" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-semibold">AI Farm Advisor</h2>
-                    <p className="text-blue-100 mt-1 font-medium">
+                    <h2 className="text-xl font-bold">AI Advisor</h2>
+                    <p className="text-indigo-100 mt-1 font-medium text-sm">
                       Get instant expert farming advice in English, Hindi, or
                       Tamil with voice support
                     </p>
                   </div>
                 </div>
                 <Link href={"/dashboard/chat"} className="cursor-pointer">
-                  <Button
-                    size="lg"
-                    className="w-full bg-white text-blue-700 hover:bg-blue-50 font-bold text-lg mt-4 py-6 flex justify-between items-center cursor-pointer shadow-md"
-                  >
-                    Start Chatting
+                  <Button className="w-full bg-white text-indigo-700 hover:bg-indigo-50 font-bold text-lg mt-4 py-5 text-md flex justify-between items-center cursor-pointer shadow-md">
+                    Start Chat Now
                     <ChevronRight className="h-6 w-6" />
                   </Button>
                 </Link>
@@ -755,15 +1096,15 @@ export default function AgriLensDashboard() {
             </div>
 
             {/* Priority 3: Select Your Crop Card - Essential for Scanning */}
-            <Card className="shadow-md border border-green-200">
-              <CardHeader className="bg-green-50/50">
+            <Card className="shadow-sm border border-emerald-200 rounded-2xl">
+              <CardHeader className="bg-emerald-50/60">
                 <div className="flex items-center gap-2">
-                  <Leaf className="h-5 w-5 text-green-600" />
-                  <CardTitle className="text-green-800">
+                  <Leaf className="h-5 w-5 text-emerald-600" />
+                  <CardTitle className="text-emerald-800">
                     Select Your Crop
                   </CardTitle>
                 </div>
-                <CardDescription className="text-green-700">
+                <CardDescription className="text-emerald-700">
                   Choose from our supported crops for accurate disease detection
                 </CardDescription>
               </CardHeader>
@@ -774,7 +1115,7 @@ export default function AgriLensDashboard() {
                     placeholder="Search crops..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 border-green-200 focus:border-green-400"
+                    className="pl-10 border-emerald-200 focus:border-emerald-400"
                   />
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -782,10 +1123,10 @@ export default function AgriLensDashboard() {
                     <button
                       key={crop.name}
                       onClick={() => handleCropSelection(crop)}
-                      className={`cursor-pointer group p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 text-center ${
+                      className={`cursor-pointer group p-3 sm:p-4 rounded-xl border-2 transition-all duration-200 text-center ${
                         crop.isAval
-                          ? "hover:border-green-500 hover:bg-green-50 border-green-200 hover:shadow-md"
-                          : "border-gray-300 bg-gray-100 opacity-60 cursor-not-allowed"
+                          ? "hover:border-emerald-500 hover:bg-emerald-50 border-emerald-200 hover:shadow-md"
+                          : "border-gray-200 bg-gray-100 opacity-60 cursor-not-allowed"
                       }`}
                       disabled={!crop.isAval}
                     >
@@ -795,15 +1136,15 @@ export default function AgriLensDashboard() {
                         </div>
                       </div>
                       <h3
-                        className={`font-semibold text-sm sm:text-base ${
-                          crop.isAval ? "text-gray-800" : "text-gray-500"
+                        className={`font-bold text-sm sm:text-base ${
+                          crop.isAval ? "text-gray-900" : "text-gray-500"
                         }`}
                       >
                         {crop.name}
                       </h3>
                       <p
                         className={`text-xs font-medium ${
-                          crop.isAval ? "text-green-600" : "text-gray-400"
+                          crop.isAval ? "text-emerald-600" : "text-gray-400"
                         }`}
                       >
                         {crop.isAval ? "Active" : "Coming Soon..."}
@@ -815,76 +1156,87 @@ export default function AgriLensDashboard() {
             </Card>
 
             {/* Priority 4: Recent Activity - What's Happening Now */}
-            <Card className="shadow-md border border-indigo-200">
-              <CardHeader className="bg-indigo-50/50">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <div className="h-3 w-3 bg-indigo-500 rounded-full animate-pulse"></div>
-                  Recent Scan Activity
+            <Card className="shadow-md border-0 rounded-2xl bg-white/80 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
+              <CardHeader className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-t-2xl border-b border-indigo-100">
+                <CardTitle className="text-lg flex items-center gap-2 font-bold text-gray-900">
+                  <div className="h-3 w-3 bg-indigo-500 rounded-full animate-ping"></div>
+                  📊 Recent Scans
                 </CardTitle>
-                <CardDescription className="text-indigo-700">
-                  Latest plant health scans and results
+                <CardDescription className="text-sm text-gray-600">
+                  Track your latest crop health results
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+
+              <CardContent className="p-4">
                 {historyLoading ? (
-                  <div className="flex items-center justify-center h-32">
-                    <div className="text-gray-500">
-                      Loading recent activity...
-                    </div>
+                  <div className="flex flex-col items-center justify-center h-36 text-gray-500 gap-2">
+                    <div className="animate-spin rounded-full h-8 w-8 border-2 border-indigo-500 border-t-transparent"></div>
+                    <p>Loading activity...</p>
                   </div>
                 ) : (
-                  <div className="space-y-3 max-h-64 overflow-y-auto">
-                    {scanHistory.slice(0, 5).map((scan, index) => (
+                  <div className="space-y-3 max-h-72 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-indigo-300/60 scrollbar-track-transparent">
+                    {scanHistory.slice(0, 5).map((scan) => (
                       <div
                         key={scan.id}
-                        className="flex items-center gap-4 p-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200 hover:shadow-sm transition-shadow"
+                        className="flex items-center justify-between gap-4 p-4 bg-white rounded-xl border border-gray-100 hover:border-indigo-200 hover:shadow-sm transition-all duration-200"
                       >
-                        <div
-                          className={`w-4 h-4 rounded-full ${
-                            scan.isHealthy ? "bg-green-500" : "bg-red-500"
-                          } shadow-sm`}
-                        ></div>
-                        <div className="flex-1">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <p className="font-semibold text-gray-900">
-                                {scan.crop}
-                              </p>
-                              <p
-                                className={`text-sm font-medium ${
-                                  scan.isHealthy
-                                    ? "text-green-600"
-                                    : "text-red-600"
-                                }`}
-                              >
-                                {scan.isHealthy
-                                  ? "Healthy"
-                                  : `${scan.disease || "Disease detected"}`}
-                              </p>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-sm font-bold text-gray-900">
-                                {Math.round(scan.confidence * 100)}%
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                {scan.timestamp.toLocaleDateString()}
-                              </p>
-                            </div>
+                        {/* Status Icon */}
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div
+                            className={`w-3.5 h-3.5 rounded-full shadow ${
+                              scan.isHealthy ? "bg-green-500" : "bg-red-500"
+                            }`}
+                          ></div>
+                          <div className="min-w-0">
+                            <p className="font-semibold text-gray-900 truncate">
+                              {scan.crop}
+                            </p>
+                            <p
+                              className={`text-sm ${
+                                scan.isHealthy
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                              }`}
+                            >
+                              {scan.isHealthy
+                                ? "Healthy"
+                                : `${scan.disease || "Disease detected"}`}
+                            </p>
                           </div>
+                        </div>
+
+                        {/* Confidence + Date */}
+                        <div className="text-right shrink-0">
+                          <p className="text-sm font-semibold text-gray-900">
+                            {Math.round(scan.confidence * 100)}%
+                          </p>
+                          <div className="mt-1 w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full ${
+                                scan.isHealthy ? "bg-green-500" : "bg-red-500"
+                              }`}
+                              style={{
+                                width: `${Math.round(scan.confidence * 100)}%`,
+                              }}
+                            />
+                          </div>
+                          <p className="mt-1 text-xs text-gray-500">
+                            {scan.timestamp.toLocaleDateString()}
+                          </p>
                         </div>
                       </div>
                     ))}
+
+                    {/* Empty state */}
                     {scanHistory.length === 0 && (
-                      <div className="text-center py-8 text-gray-500">
-                        <div className="w-12 h-12 mx-auto mb-3 bg-gray-100 rounded-full flex items-center justify-center">
-                          <Search className="h-6 w-6 text-gray-400" />
+                      <div className="text-center py-10 text-gray-500">
+                        <div className="w-14 h-14 mx-auto mb-3 bg-gray-100 rounded-full flex items-center justify-center text-2xl">
+                          🔍
                         </div>
-                        <div className="font-medium">
-                          No recent scans available
-                        </div>
-                        <div className="text-sm">
-                          Start scanning to see activity here!
-                        </div>
+                        <p className="font-medium">No recent scans</p>
+                        <p className="text-sm">
+                          Start scanning to see activity here.
+                        </p>
                       </div>
                     )}
                   </div>
@@ -894,186 +1246,193 @@ export default function AgriLensDashboard() {
           </div>
           {/* === RIGHT COLUMN === */}
           <div className="xl:col-span-1 space-y-4 sm:space-y-6">
-            {/* Priority 2: Enhanced Weather Card - Environmental Context */}
-            <Card className="shadow-lg border border-blue-200">
-              <CardHeader className="pb-2 bg-blue-50/50">
+            {/* Weather Section - Action-Oriented */}
+            <Card className="shadow-lg border border-[#2F855A]/20 rounded-2xl bg-white/95 backdrop-blur">
+              <CardHeader className="pb-2 bg-[#2F855A]/5 border-b border-[#2F855A]/10">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    {/* <Thermometer className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" /> */}
-                    <CardTitle className="text-base sm:text-lg text-blue-800">
-                      Current Weather
+                    <CardTitle className="text-base sm:text-lg text-[#2F855A] font-bold">
+                      Live Weather
                     </CardTitle>
                   </div>
-                  <div className="text-xs text-blue-600 font-medium">
+                  <div className="text-xs text-[#2F855A]/80 font-medium">
                     {weatherData?.current?.last_updated || "Live"}
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-3 sm:space-y-4">
+              <CardContent className="space-y-4 sm:space-y-6">
                 {/* Main Temperature Display */}
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                      <Sun className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="w-14 h-14 sm:w-18 sm:h-18 bg-[#2F855A]/10 rounded-full flex items-center justify-center shadow-inner">
+                      <CloudSun className="h-7 w-7 sm:h-9 sm:w-9 text-[#2F855A]" />
                     </div>
                     <div>
-                      <div className="text-2xl sm:text-3xl font-bold text-gray-900">
+                      <div className="text-3xl sm:text-4xl font-extrabold text-[#2F855A]">
                         {weatherData?.current?.temp_c ||
                           mockWeather.temperature}
                         °C
                       </div>
-                      <p className="text-xs sm:text-sm text-gray-600">
-                        Feels like {weatherData?.current?.feelslike_c || "36.7"}
-                        °C
+                      <p className="text-sm text-gray-600">
+                        {weatherData?.current?.condition?.text || "Mist"}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                {/* Location and Condition */}
-                <div className="text-center py-2 border-y border-blue-200">
-                  <p className="font-semibold text-gray-800 text-sm sm:text-base">
+                {/* Location */}
+                <div className="text-center py-2 bg-[#FAF9F6] rounded-lg">
+                  <MapPin className="h-4 w-4 mx-auto mb-1 text-[#2F855A]" />
+                  <p className="font-semibold text-[#2F855A] text-sm sm:text-base">
                     {weatherData?.location?.name || "Chennai"},{" "}
                     {weatherData?.location?.region || "Tamil Nadu"}
-                  </p>
-                  <p className="text-xs sm:text-sm text-gray-600">
-                    {weatherData?.current?.condition?.text || "Mist"}
                   </p>
                 </div>
 
                 {/* Weather Details Grid */}
-                <div className="grid grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm">
-                  <div className="flex items-center gap-2 bg-white/50 rounded-lg p-2">
-                    <Droplets className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500" />
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="flex items-center gap-2 bg-[#FAF9F6] rounded-lg p-3">
+                    <Droplets className="h-4 w-4 text-[#2F855A]" />
                     <div>
-                      <p className="text-gray-500">Humidity</p>
-                      <p className="font-semibold">
+                      <p className="text-gray-600 text-xs">Humidity</p>
+                      <p className="font-bold text-[#2F855A]">
                         {weatherData?.current?.humidity || "84"}%
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 bg-white/50 rounded-lg p-2">
+                  <div className="flex items-center gap-2 bg-[#FAF9F6] rounded-lg p-3">
                     <div className="w-4 h-4 bg-gray-400 rounded-full flex items-center justify-center">
                       <div className="w-2 h-2 bg-white rounded-full"></div>
                     </div>
                     <div>
-                      <p className="text-gray-500">Wind</p>
-                      <p className="font-semibold">
+                      <p className="text-gray-600 text-xs">Wind</p>
+                      <p className="font-bold text-[#2F855A]">
                         {weatherData?.current?.wind_kph || "18.7"} kph
                       </p>
                     </div>
                   </div>
-
-                  <div className="flex items-center gap-2 bg-white/50 rounded-lg p-2">
-                    <Droplets className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500" />
-                    <div>
-                      <p className="text-gray-500">Rainfall</p>
-                      <p className="font-semibold">
-                        {weatherData?.current?.precip_mm || "0.0"} mm
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 bg-white/50 rounded-lg p-2">
-                    <div className="w-4 h-4 bg-gray-400 rounded-full"></div>
-                    <div>
-                      <p className="text-gray-500">Visibility</p>
-                      <p className="font-semibold">
-                        {weatherData?.current?.vis_km || "5.0"} km
-                      </p>
-                    </div>
-                  </div>
                 </div>
 
-                {/* Wind Direction */}
-                <div className="text-center">
-                  <p className="text-xs text-gray-500">
-                    Wind Direction: {weatherData?.current?.wind_dir || "South"}(
-                    {weatherData?.current?.wind_degree || "188"}°)
-                  </p>
+                {/* Actionable Farming Advice */}
+                <div className="bg-[#F6AD55]/10 border border-[#F6AD55]/20 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className="h-5 w-5 text-[#F6AD55] mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="font-semibold text-[#F6AD55] text-sm mb-1">
+                        Farming Advisory
+                      </p>
+                      <p className="text-sm text-gray-700">
+                        Rain expected tomorrow — avoid spraying pesticides today
+                        to prevent runoff and protect your crops.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Priority 3: Quick Access to New Features */}
-            <Card className="shadow-md border border-indigo-200">
-              <CardHeader className="bg-indigo-50/50">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <div className="h-3 w-3 bg-indigo-500 rounded-full"></div>
-                  Quick Access
+            {/* Farmer's Toolbox */}
+            <Card className="shadow-lg border border-[#2F855A]/20 rounded-2xl bg-white/95 backdrop-blur">
+              <CardHeader className="bg-[#2F855A]/5 border-b border-[#2F855A]/10">
+                <CardTitle className="text-lg sm:text-xl flex items-center gap-2 font-bold text-[#2F855A]">
+                  <Target className="h-5 w-5" />
+                  Farmer's Toolbox
                 </CardTitle>
-                <CardDescription className="text-indigo-700">
-                  Essential tools and information
+                <CardDescription className="text-[#2F855A]/80">
+                  Essential tools for modern farming
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 gap-3">
-                  {/* Government Schemes Card */}
+              <CardContent className="pt-4">
+                <div className="grid grid-cols-1 gap-3 sm:gap-4">
+                  {/* Government Schemes */}
                   <Link href="/dashboard/schemes">
                     <Button
                       variant="outline"
-                      className="w-full h-auto p-3 bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200 hover:border-blue-300 hover:shadow-sm transition-all"
+                      className="w-full p-3 sm:p-4 bg-gradient-to-r from-[#2F855A]/5 to-[#2F855A]/10 border-[#2F855A]/20 hover:border-[#2F855A]/40 hover:shadow-md transition-all rounded-xl overflow-hidden h-auto"
                     >
-                      <div className="flex items-center gap-3 w-full">
-                        <div className="p-2 bg-blue-100 rounded-lg">
-                          <Building2 className="h-5 w-5 text-blue-600" />
+                      <div className="flex items-center justify-between gap-3 w-full">
+                        <div className="p-2 sm:p-3 bg-[#2F855A] rounded-lg flex-shrink-0">
+                          <Building2 className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
                         </div>
-                        <div className="text-left flex-1">
-                          <h4 className="font-semibold text-blue-800">
+                        <div className="text-left flex-1 min-w-0">
+                          <h4 className="font-bold text-[#2F855A] text-sm sm:text-base">
                             Government Schemes
                           </h4>
-                          <p className="text-xs text-blue-600">
-                            SHC, PMFBY, eNAM, KCC & more
+                          <p className="text-sm sm:text-sm text-[#2F855A]/80">
+                            insurance, subsidies
                           </p>
                         </div>
-                        <ChevronRight className="h-4 w-4 text-blue-400" />
+                        <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 text-[#2F855A]/60 flex-shrink-0" />
                       </div>
                     </Button>
                   </Link>
 
-                  {/* Market Prices Card */}
+                  {/* Market Prices */}
                   <Link href="/dashboard/market">
                     <Button
                       variant="outline"
-                      className="w-full h-auto p-3 bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 hover:border-green-300 hover:shadow-sm transition-all"
+                      className="w-full p-3 sm:p-4 bg-gradient-to-r from-[#F6AD55]/5 to-[#F6AD55]/10 border-[#F6AD55]/20 hover:border-[#F6AD55]/40 hover:shadow-md transition-all rounded-xl overflow-hidden h-auto"
                     >
-                      <div className="flex items-center gap-3 w-full">
-                        <div className="p-2 bg-green-100 rounded-lg">
-                          <TrendingUp className="h-5 w-5 text-green-600" />
+                      <div className="flex items-center justify-between gap-3 w-full">
+                        <div className="p-2 sm:p-3 bg-[#F6AD55] rounded-lg flex-shrink-0">
+                          <TrendingUp className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
                         </div>
-                        <div className="text-left flex-1">
-                          <h4 className="font-semibold text-green-800">
+                        <div className="text-left flex-1 min-w-0">
+                          <h4 className="font-bold text-[#F6AD55] text-sm sm:text-base">
                             Market Prices
                           </h4>
-                          <p className="text-xs text-green-600">
-                            Live rates from major mandis
+                          <p className="text-sm sm:text-sm text-[#F6AD55]/80">
+                            Today's mandi rates
                           </p>
                         </div>
-                        <ChevronRight className="h-4 w-4 text-green-400" />
+                        <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 text-[#F6AD55]/60 flex-shrink-0" />
                       </div>
                     </Button>
                   </Link>
 
-                  {/* Weather Advisory Card */}
+                  {/* Weather Forecast */}
                   <Link href="/dashboard/weather">
                     <Button
                       variant="outline"
-                      className="w-full h-auto p-3 bg-gradient-to-r from-orange-50 to-yellow-50 border-orange-200 hover:border-orange-300 hover:shadow-sm transition-all"
+                      className="w-full p-3 sm:p-4 bg-gradient-to-r from-[#2F855A]/5 to-[#2F855A]/10 border-[#2F855A]/20 hover:border-[#2F855A]/40 hover:shadow-md transition-all rounded-xl overflow-hidden h-auto"
                     >
-                      <div className="flex items-center gap-3 w-full">
-                        <div className="p-2 bg-orange-100 rounded-lg">
-                          <Sun className="h-5 w-5 text-orange-600" />
+                      <div className="flex items-center justify-between gap-3 w-full">
+                        <div className="p-2 sm:p-3 bg-[#2F855A] rounded-lg flex-shrink-0">
+                          <CloudSun className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
                         </div>
-                        <div className="text-left flex-1">
-                          <h4 className="font-semibold text-orange-800">
-                            Weather Advisory
+                        <div className="text-left flex-1 min-w-0">
+                          <h4 className="font-bold text-[#2F855A] text-sm sm:text-base">
+                            Weather Forecast
                           </h4>
-                          <p className="text-xs text-orange-600">
-                            Agricultural weather insights
+                          <p className="text-sm sm:text-sm text-[#2F855A]/80">
+                            5-day predictions
                           </p>
                         </div>
-                        <ChevronRight className="h-4 w-4 text-orange-400" />
+                        <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 text-[#2F855A]/60 flex-shrink-0" />
+                      </div>
+                    </Button>
+                  </Link>
+
+                  {/* Disease Scan */}
+                  <Link href="/dashboard/scanner">
+                    <Button
+                      variant="outline"
+                      className="w-full p-3 sm:p-4 bg-gradient-to-r from-[#E53E3E]/5 to-[#E53E3E]/10 border-[#E53E3E]/20 hover:border-[#E53E3E]/40 hover:shadow-md transition-all rounded-xl overflow-hidden h-auto"
+                    >
+                      <div className="flex items-center justify-between gap-3 w-full">
+                        <div className="p-2 sm:p-3 bg-[#E53E3E] rounded-lg flex-shrink-0">
+                          <ScanIcon className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
+                        </div>
+                        <div className="text-left flex-1 min-w-0">
+                          <h4 className="font-bold text-[#E53E3E] text-sm sm:text-base">
+                            Disease Scan
+                          </h4>
+                          <p className="text-sm sm:text-sm text-[#E53E3E]/80">
+                            Instant suggestions
+                          </p>
+                        </div>
+                        <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 text-[#E53E3E]/60 flex-shrink-0" />
                       </div>
                     </Button>
                   </Link>
@@ -1082,44 +1441,44 @@ export default function AgriLensDashboard() {
             </Card>
 
             {/* Priority 4: Quick Action Stats - Live Data */}
-            <Card className="shadow-md border border-purple-200">
-              <CardHeader className="pb-3 bg-purple-50/50">
-                <CardTitle className="text-base sm:text-lg text-purple-800 flex items-center gap-2">
+            <Card className="shadow-sm border border-purple-200 rounded-2xl">
+              <CardHeader className="pb-3 bg-purple-50/60">
+                <CardTitle className="text-base sm:text-lg text-purple-800 flex items-center gap-2 font-extrabold">
                   <Activity className="h-4 w-4" />
                   Quick Stats
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3 sm:space-y-4 text-xs sm:text-sm">
-                  <div className="flex justify-between items-center p-2 bg-blue-50 rounded-lg">
+                  <div className="flex justify-between items-center p-2 bg-blue-50 rounded-xl">
                     <span className="text-blue-700 font-medium">
                       Total Scans
                     </span>
-                    <span className="font-bold text-blue-600 text-sm sm:text-base">
+                    <span className="font-extrabold text-blue-700 text-sm sm:text-base">
                       {historyLoading ? "..." : getStats().totalScans}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center p-2 bg-green-50 rounded-lg">
+                  <div className="flex justify-between items-center p-2 bg-green-50 rounded-xl">
                     <span className="text-green-700 font-medium">
                       Healthy Plants
                     </span>
-                    <span className="font-bold text-green-600 text-sm sm:text-base">
+                    <span className="font-extrabold text-green-700 text-sm sm:text-base">
                       {historyLoading ? "..." : `${getStats().successRate}%`}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center p-2 bg-red-50 rounded-lg">
+                  <div className="flex justify-between items-center p-2 bg-red-50 rounded-xl">
                     <span className="text-red-700 font-medium">
                       Diseases Found
                     </span>
-                    <span className="font-bold text-red-600 text-sm sm:text-base">
+                    <span className="font-extrabold text-red-700 text-sm sm:text-base">
                       {historyLoading ? "..." : getStats().diseasedCount}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center p-2 bg-amber-50 rounded-lg">
+                  <div className="flex justify-between items-center p-2 bg-amber-50 rounded-xl">
                     <span className="text-amber-700 font-medium">
                       This Week
                     </span>
-                    <span className="font-bold text-amber-600 text-sm sm:text-base">
+                    <span className="font-extrabold text-amber-700 text-sm sm:text-base">
                       {historyLoading
                         ? "..."
                         : Math.max(0, getStats().totalScans - 10)}
@@ -1130,6 +1489,8 @@ export default function AgriLensDashboard() {
             </Card>
           </div>
         </div>
+        {/* ElevenLabs Convai Widget - Hidden on chat page */}
+        <ElevenLabsWidget />
       </main>
     </div>
   );
