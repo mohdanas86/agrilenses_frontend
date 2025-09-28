@@ -128,7 +128,6 @@ interface BarChartDataPoint {
   name: string;
   value: number;
   color: string;
-  percentage: number;
 }
 
 // Mock data based on the design
@@ -225,15 +224,11 @@ export default function AgriLensDashboard() {
         name: "Healthy Plants",
         value: healthyCount,
         color: "#10b981",
-        percentage:
-          totalCount > 0 ? Math.round((healthyCount / totalCount) * 100) : 0,
       },
       {
         name: "Diseased Plants",
         value: diseasedCount,
         color: "#ef4444",
-        percentage:
-          totalCount > 0 ? Math.round((diseasedCount / totalCount) * 100) : 0,
       },
     ].filter((item) => item.value > 0); // Filter out empty data
 
@@ -289,11 +284,11 @@ export default function AgriLensDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#FAF9F6] via-white to-[#FAF9F6] text-gray-800">
-      <main className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    <div className="min-h-screen bg-gradient-to-br from-[#FAF9F6] via-white to-[#F0F8F0] text-gray-800">
+      <main className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
         {/* Header / Branding */}
         <div className="mb-8 sm:mb-12">
-          <div className="text-center">
+          <div className="text-center bg-white/60 backdrop-blur-sm rounded-3xl p-6 sm:p-8 shadow-lg border border-white/20">
             <div className="flex items-center justify-center gap-3 mb-4">
               <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-2xl bg-[#2F855A] text-white flex items-center justify-center shadow-lg">
                 <Sprout className="h-6 w-6 sm:h-8 sm:w-8" />
@@ -316,8 +311,8 @@ export default function AgriLensDashboard() {
 
         {/* Hero Impact Section */}
         <div className="mb-8 sm:mb-12">
-          <Card className="rounded-2xl border border-[#2F855A]/20 bg-white/95 backdrop-blur shadow-xl overflow-hidden">
-            <CardContent className="p-6 sm:p-8">
+          <Card className="rounded-3xl border border-[#2F855A]/20 bg-white/95 backdrop-blur shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300">
+            <CardContent className="p-6 sm:p-8 lg:p-10">
               <div className="text-center mb-6">
                 <h2 className="text-2xl sm:text-3xl font-bold text-[#2F855A] mb-2">
                   What Farmers Get in 30 Seconds
@@ -410,9 +405,9 @@ export default function AgriLensDashboard() {
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            <Card className="text-center p-4 sm:p-6 bg-gradient-to-br from-[#2F855A]/5 to-[#2F855A]/10 border-[#2F855A]/20">
+            <Card className="text-center p-4 sm:p-6 bg-gradient-to-br from-[#2F855A]/5 to-[#2F855A]/10 border-[#2F855A]/20 hover:shadow-lg hover:scale-105 transition-all duration-200">
               <div className="flex justify-center mb-3">
-                <div className="p-3 bg-[#2F855A] rounded-full text-white">
+                <div className="p-3 bg-[#2F855A] rounded-full text-white shadow-md">
                   <CheckCircle className="h-6 w-6" />
                 </div>
               </div>
@@ -423,9 +418,9 @@ export default function AgriLensDashboard() {
               <p className="text-xs text-gray-600">This week</p>
             </Card>
 
-            <Card className="text-center p-4 sm:p-6 bg-gradient-to-br from-[#E53E3E]/5 to-[#E53E3E]/10 border-[#E53E3E]/20">
+            <Card className="text-center p-4 sm:p-6 bg-gradient-to-br from-[#E53E3E]/5 to-[#E53E3E]/10 border-[#E53E3E]/20 hover:shadow-lg hover:scale-105 transition-all duration-200">
               <div className="flex justify-center mb-3">
-                <div className="p-3 bg-[#E53E3E] rounded-full text-white">
+                <div className="p-3 bg-[#E53E3E] rounded-full text-white shadow-md">
                   <AlertTriangle className="h-6 w-6" />
                 </div>
               </div>
@@ -438,9 +433,9 @@ export default function AgriLensDashboard() {
               <p className="text-xs text-gray-600">Early prevention</p>
             </Card>
 
-            <Card className="text-center p-4 sm:p-6 bg-gradient-to-br from-[#F6AD55]/5 to-[#F6AD55]/10 border-[#F6AD55]/20">
+            <Card className="text-center p-4 sm:p-6 bg-gradient-to-br from-[#F6AD55]/5 to-[#F6AD55]/10 border-[#F6AD55]/20 hover:shadow-lg hover:scale-105 transition-all duration-200">
               <div className="flex justify-center mb-3">
-                <div className="p-3 bg-[#F6AD55] rounded-full text-white">
+                <div className="p-3 bg-[#F6AD55] rounded-full text-white shadow-md">
                   <Droplets className="h-6 w-6" />
                 </div>
               </div>
@@ -451,9 +446,9 @@ export default function AgriLensDashboard() {
               <p className="text-xs text-gray-600">Per farmer</p>
             </Card>
 
-            <Card className="text-center p-4 sm:p-6 bg-gradient-to-br from-[#2F855A]/5 to-[#2F855A]/10 border-[#2F855A]/20">
+            <Card className="text-center p-4 sm:p-6 bg-gradient-to-br from-[#2F855A]/5 to-[#2F855A]/10 border-[#2F855A]/20 hover:shadow-lg hover:scale-105 transition-all duration-200">
               <div className="flex justify-center mb-3">
-                <div className="p-3 bg-[#2F855A] rounded-full text-white">
+                <div className="p-3 bg-[#2F855A] rounded-full text-white shadow-md">
                   <TrendingUp className="h-6 w-6" />
                 </div>
               </div>
@@ -566,7 +561,7 @@ export default function AgriLensDashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div className="text-center p-2 bg-white/70 rounded-lg">
                       <Globe className="h-5 w-5 mx-auto mb-1 text-[#2F855A]" />
                       <div className="text-xs font-medium text-gray-700">
@@ -596,60 +591,88 @@ export default function AgriLensDashboard() {
           {/* === LEFT COLUMN === */}
           <div className="xl:col-span-3 space-y-4 sm:space-y-6">
             {/* Priority 1: Quick Stats Overview - Key Metrics */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-              <Card className="shadow-sm border-l-4 border-l-emerald-500 bg-emerald-50/40">
-                <CardContent className="p-3 sm:p-4">
-                  <div className="flex items-center gap-2">
-                    <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
-                    <p className="text-xs sm:text-sm font-semibold text-gray-700">
-                      Total
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              <Card className="shadow-sm border-l-4 border-l-emerald-500 bg-gradient-to-r from-emerald-50 to-emerald-100/50 hover:shadow-md transition-all duration-200">
+                <CardContent className="p-4 sm:p-5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-emerald-500 rounded-lg text-white">
+                        <Activity className="h-5 w-5 sm:h-6 sm:w-6" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-700">
+                          Total Scans
+                        </p>
+                        <p className="text-xs text-gray-500">All time</p>
+                      </div>
+                    </div>
+                    <p className="text-2xl sm:text-3xl font-extrabold text-emerald-700">
+                      {historyLoading ? "..." : getStats().totalScans}
                     </p>
                   </div>
-                  <p className="text-xl sm:text-3xl font-extrabold text-emerald-700 mt-1">
-                    {historyLoading ? "..." : getStats().totalScans}
-                  </p>
                 </CardContent>
               </Card>
 
-              <Card className="shadow-sm border-l-4 border-l-green-500 bg-green-50/50">
-                <CardContent className="p-3 sm:p-4">
-                  <div className="flex items-center gap-2">
-                    <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
-                    <p className="text-xs sm:text-sm font-semibold text-gray-700">
-                      Healthy
+              <Card className="shadow-sm border-l-4 border-l-green-500 bg-gradient-to-r from-green-50 to-green-100/50 hover:shadow-md transition-all duration-200">
+                <CardContent className="p-4 sm:p-5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-green-500 rounded-lg text-white">
+                        <Shield className="h-5 w-5 sm:h-6 sm:w-6" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-700">
+                          Healthy Plants
+                        </p>
+                        <p className="text-xs text-gray-500">Disease free</p>
+                      </div>
+                    </div>
+                    <p className="text-2xl sm:text-3xl font-extrabold text-green-700">
+                      {historyLoading ? "..." : getStats().healthyCount}
                     </p>
                   </div>
-                  <p className="text-xl sm:text-3xl font-extrabold text-green-700 mt-1">
-                    {historyLoading ? "..." : getStats().healthyCount}
-                  </p>
                 </CardContent>
               </Card>
 
-              <Card className="shadow-sm border-l-4 border-l-red-500 bg-red-50/50">
-                <CardContent className="p-3 sm:p-4">
-                  <div className="flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
-                    <p className="text-xs sm:text-sm font-semibold text-gray-700">
-                      Diseased
+              <Card className="shadow-sm border-l-4 border-l-red-500 bg-gradient-to-r from-red-50 to-red-100/50 hover:shadow-md transition-all duration-200">
+                <CardContent className="p-4 sm:p-5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-red-500 rounded-lg text-white">
+                        <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-700">
+                          Diseased Plants
+                        </p>
+                        <p className="text-xs text-gray-500">Need attention</p>
+                      </div>
+                    </div>
+                    <p className="text-2xl sm:text-3xl font-extrabold text-red-700">
+                      {historyLoading ? "..." : getStats().diseasedCount}
                     </p>
                   </div>
-                  <p className="text-xl sm:text-3xl font-extrabold text-red-700 mt-1">
-                    {historyLoading ? "..." : getStats().diseasedCount}
-                  </p>
                 </CardContent>
               </Card>
 
-              <Card className="shadow-sm border-l-4 border-l-purple-500 bg-purple-50/50">
-                <CardContent className="p-3 sm:p-4">
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
-                    <p className="text-xs sm:text-sm font-semibold text-gray-700">
-                      Success
+              <Card className="shadow-sm border-l-4 border-l-purple-500 bg-gradient-to-r from-purple-50 to-purple-100/50 hover:shadow-md transition-all duration-200">
+                <CardContent className="p-4 sm:p-5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-purple-500 rounded-lg text-white">
+                        <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-700">
+                          This Week
+                        </p>
+                        <p className="text-xs text-gray-500">Recent activity</p>
+                      </div>
+                    </div>
+                    <p className="text-2xl sm:text-3xl font-extrabold text-purple-700">
+                      {historyLoading ? "..." : getStats().totalScans}
                     </p>
                   </div>
-                  <p className="text-xl sm:text-3xl font-extrabold text-purple-700 mt-1">
-                    {historyLoading ? "..." : `${getStats().successRate}%`}
-                  </p>
                 </CardContent>
               </Card>
             </div>
@@ -665,15 +688,15 @@ export default function AgriLensDashboard() {
               </div>
 
               {/* Charts Row */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
                 {/* Line Chart - Tomato & Potato Disease Detection */}
                 <Card className="shadow-sm rounded-2xl border border-emerald-100 p-0 max-h-[420px] flex flex-col bg-white/90 backdrop-blur">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg flex items-center gap-2">
                       <div className="h-2 w-2 bg-red-500 rounded-full"></div>
-                      Disease Trends (7d)
+                      Disease Detection Trends
                     </CardTitle>
-                    <CardDescription>Tomato vs Potato</CardDescription>
+                    <CardDescription>Weekly disease detection for tomato and potato crops</CardDescription>
                   </CardHeader>
 
                   <CardContent className="pt-4 flex-1">
@@ -869,9 +892,9 @@ export default function AgriLensDashboard() {
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
                       <div className="h-2 w-2 bg-green-500 rounded-full"></div>
-                      Health Mix
+                      Plant Health Overview
                     </CardTitle>
-                    <CardDescription>Healthy vs Diseased</CardDescription>
+                    <CardDescription>Current healthy vs diseased plant counts</CardDescription>
                   </CardHeader>
                   <CardContent className="flex-1">
                     {historyLoading ? (
@@ -970,11 +993,7 @@ export default function AgriLensDashboard() {
                             />
                             <Tooltip
                               formatter={(value, name) => [
-                                `${value} (${
-                                  barChartData.find(
-                                    (item) => item.name === name
-                                  )?.percentage || 0
-                                }%)`,
+                                `${value} plants`,
                                 name === "Healthy Plants"
                                   ? "Healthy"
                                   : "Diseased",
@@ -1036,9 +1055,6 @@ export default function AgriLensDashboard() {
                               <div className="text-lg sm:text-xl font-bold text-gray-900">
                                 {item.value}
                               </div>
-                              <div className="text-xs sm:text-sm text-gray-600 font-medium">
-                                {item.percentage}%
-                              </div>
                             </div>
                           ))}
                         </div>
@@ -1049,7 +1065,7 @@ export default function AgriLensDashboard() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Priority 1: Scan Your Crop Card - Most Important */}
               <div className="bg-gradient-to-br from-emerald-600 to-green-600 rounded-2xl p-6 text-white shadow-lg border border-emerald-500/50">
                 <div className="flex items-start gap-4">
@@ -1118,7 +1134,7 @@ export default function AgriLensDashboard() {
                     className="pl-10 border-emerald-200 focus:border-emerald-400"
                   />
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
                   {filteredCrops.map((crop) => (
                     <button
                       key={crop.name}
@@ -1205,22 +1221,9 @@ export default function AgriLensDashboard() {
                           </div>
                         </div>
 
-                        {/* Confidence + Date */}
+                        {/* Date */}
                         <div className="text-right shrink-0">
                           <p className="text-sm font-semibold text-gray-900">
-                            {Math.round(scan.confidence * 100)}%
-                          </p>
-                          <div className="mt-1 w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                              className={`h-full ${
-                                scan.isHealthy ? "bg-green-500" : "bg-red-500"
-                              }`}
-                              style={{
-                                width: `${Math.round(scan.confidence * 100)}%`,
-                              }}
-                            />
-                          </div>
-                          <p className="mt-1 text-xs text-gray-500">
                             {scan.timestamp.toLocaleDateString()}
                           </p>
                         </div>
@@ -1290,7 +1293,7 @@ export default function AgriLensDashboard() {
                 </div>
 
                 {/* Weather Details Grid */}
-                <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                   <div className="flex items-center gap-2 bg-[#FAF9F6] rounded-lg p-3">
                     <Droplets className="h-4 w-4 text-[#2F855A]" />
                     <div>
@@ -1463,7 +1466,7 @@ export default function AgriLensDashboard() {
                       Healthy Plants
                     </span>
                     <span className="font-extrabold text-green-700 text-sm sm:text-base">
-                      {historyLoading ? "..." : `${getStats().successRate}%`}
+                      {historyLoading ? "..." : getStats().healthyCount}
                     </span>
                   </div>
                   <div className="flex justify-between items-center p-2 bg-red-50 rounded-xl">

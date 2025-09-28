@@ -143,11 +143,11 @@ export default function DashboardLayout({
           </div>
 
           {/* Mobile breadcrumb - show current page only */}
-          <div className="lg:hidden flex-1 text-center">
+          {/* <div className="lg:hidden flex-1 text-center">
             <span className="text-sm font-medium text-gray-700">
               {breadcrumbInfo.currentTitle}
             </span>
-          </div>
+          </div> */}
         </header>
 
         {/* The main content from your page files will be rendered here. */}
