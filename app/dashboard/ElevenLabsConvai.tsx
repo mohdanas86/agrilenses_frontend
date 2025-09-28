@@ -47,7 +47,9 @@ export default function ElevenLabsConvai() {
     try {
       setLoading(true);
       await conversation.startSession({
-        agentId: "agent_0301k4yrgnwxek69zvgb9evfn2tp", // 👈 replace with your agent ID
+        agentId:
+          process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID ||
+          "agent_0701k4ys2srwe4m852x1z5x4yzc1", // 👈 replace with your agent ID
         connectionType: "webrtc",
       });
     } catch (err) {

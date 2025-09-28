@@ -25,7 +25,11 @@ export default function ElevenLabsWidget() {
 
     // Create the widget element
     const widget = document.createElement("elevenlabs-convai");
-    widget.setAttribute("agent-id", "agent_0701k4ys2srwe4m852x1z5x4yzc1--");
+    widget.setAttribute(
+      "agent-id",
+      process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID ||
+        "agent_0701k4ys2srwe4m852x1z5x4yzc1"
+    );
     document.body.appendChild(widget);
 
     return () => {
